@@ -1,95 +1,64 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+
+import { type_image, EMPTY_IMAGE, type_info, EMPTY_INFO } from "@/interfaces/Uploader";
+import { Box, Paper } from "@mui/material";
+import { useState } from "react";
+import { Chart, Editor, Uploader } from '@/components'
+import * as cornerstone from 'cornerstone-core'
+
+import dynamic from 'next/dynamic'
+
+const Viewer = dynamic(() => import('../components/DICOM/Viewer'), { ssr: false })
 
 export default function Home() {
+
+  const [image, setImage] = useState<type_image>(EMPTY_IMAGE)
+  const [info, setInfo] = useState<type_info>(EMPTY_INFO)
+  const [viewPort, setViewPort] = useState<any>(null)
+  const [element, setElement] = useState<any>(null)
+
+  const updateViewPort = (width: number = 2048, center: number = 4096) => {
+    viewPort!.voi.windowWidth = width;
+    viewPort!.voi.windowCenter = center;
+    cornerstone.setViewport(element, viewPort);
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <Box component={Paper}
+      sx={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        p: 2,
+        gap: 2,
+        alignItems: 'start',
+      }}>
+      <Box sx={{
+        display: 'flex',
+        width: '100%',
+        flexDirection: 'column',
+        justifyContent: 'start',
+        flex: '0 1 450px',
+        gap: 2,
+      }}>
+        <Uploader setImage={setImage} setInfo={setInfo} />
+        <Chart info={info} />
+        <Editor image={image} updateViewPort={updateViewPort} />
+      </Box>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <Box component={Paper} elevation={3}
+        sx={{
+          height: '100%',
+          flex: '1 1 100px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Viewer image={image} cornerstone={cornerstone} setViewPort={setViewPort} setElement={setElement} updateViewPort={updateViewPort} />
+      </Box>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </Box>
   );
 }
+
+

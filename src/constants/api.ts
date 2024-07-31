@@ -1,0 +1,1 @@
+export const API_POST_IMAGE = '/api/readDicom'

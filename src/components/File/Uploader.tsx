@@ -1,0 +1,124 @@
+"use client"
+
+import { FILE_CHANGE, FILE_ERROR, NO_FILE } from "@/constants/file"
+import { readFile } from "@/lib"
+import { Box, Button, Typography } from "@mui/material"
+import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react"
+import dicomParser from "dicom-parser";
+import { type_image, type_info } from "@/interfaces/Uploader"
+
+type Props = {
+    setImage: Dispatch<SetStateAction<type_image>>
+    setInfo: Dispatch<SetStateAction<type_info>>
+}
+
+export const Uploader: FC<Props> = ({ setImage, setInfo }) => {
+
+    const [name, setName] = useState(NO_FILE)
+
+    const handleChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files![0]
+        setName(file.name)
+        const base64String = await readFile(file)
+        const base64Image = base64String.split(";base64,").pop();
+        const dicomBuffer = Buffer.from(base64Image!, "base64");
+        const dataSet = dicomParser.parseDicom(dicomBuffer);
+        const KV = dataSet.string("x00180060") || '';
+        const sensitivity = dataSet.string("x00186000") || '';
+        const date = dataSet.string("x0018700c") || '';
+        const filter = dataSet.string("x00187050") || '';
+        const mode = dataSet.string("x00187060") || '';
+        const serialNumber = dataSet.string("x00181000") || '';
+        const version = dataSet.string("x00181020") || '';
+        const exposure = dataSet.string("x00181152") || '';
+        const grid = dataSet.string("x00181166") || '';
+        const anode = dataSet.string("x00181191") || '';
+        const thickness = dataSet.string("x001811a0") || '';
+        const force = dataSet.string("x001811a2") || '';
+        const paddle = dataSet.string("x001811a4") || '';
+        const menu = dataSet.string("x00181400") || '';
+        const presentation = dataSet.string("x00080068") || '';
+        const modality = dataSet.string("x00080060") || '';
+        const institution = dataSet.string("x00080080") || '';
+        const station = dataSet.string("x00081010") || '';
+        const patientName = dataSet.string("x00100010") || '';
+
+        console.log(dataSet.elements)
+        console.log(Object.values(dataSet.elements).length)
+        Object.keys(dataSet.elements).map(item => {
+            console.log(item)
+        })
+
+
+        //DATA FOR EDITOR
+        const slope = parseInt(dataSet.string('x00281053') || '1');
+        const intercept = parseInt(dataSet.string('x00281052') || '0');
+        const windowCenter = parseInt(dataSet.string('x00281050') || '2048')
+        const windowWidth = parseInt(dataSet.string('x00281051') || '4096')
+
+        console.log(slope, intercept, windowCenter, windowWidth)
+
+        // DATA FROM IMAGE
+        const imageWidth = dataSet.uint16("x00280011") || 0;
+        const imageHeight = dataSet.uint16("x00280010") || 0;
+        const pixelDataElement = dataSet.elements.x7fe00010;
+        const bytesPerPixel = 2; // Para imágenes de 16 bits
+        const pixelData = new Uint16Array(
+            dataSet.byteArray.buffer, pixelDataElement.dataOffset, pixelDataElement.length / bytesPerPixel);
+
+        setInfo({
+            KV,
+            serialNumber,
+            version,
+            exposure,
+            grid,
+            anode,
+            thickness,
+            force,
+            paddle,
+            menu,
+            presentation,
+            modality,
+            institution,
+            station,
+            patientName
+        })
+
+        setImage({
+            name: file.name,
+            imageWidth,
+            imageHeight,
+            pixelData,
+            slope,
+            windowCenter,
+            windowWidth,
+            intercept,
+            file: file
+
+        })
+    }
+
+    return (
+        <Box
+            sx={{
+                width: '100%',
+                gap: 2,
+                display: 'flex',
+                justifyContent: 'left',
+                alignItems: 'center',
+            }}>
+            <label htmlFor='Image'>
+                <input
+                    style={{ display: 'none' }}
+                    id='Image'
+                    name='Image'
+                    type='file'
+                    onChange={handleChangeImage} />
+                <Button color='secondary' variant='contained' component='span'>
+                    {name === NO_FILE ? FILE_ERROR : FILE_CHANGE}
+                </Button>
+            </label>
+            <Typography>{name}</Typography>
+        </Box>
+    )
+}
