@@ -3,22 +3,23 @@
 import { FILE_CHANGE, FILE_ERROR, NO_FILE } from "@/constants/file"
 import { readFile } from "@/lib"
 import { Box, Button, Typography } from "@mui/material"
-import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react"
+import { ChangeEvent, FC, useState } from "react"
 import dicomParser from "dicom-parser";
-import { type_image, type_info } from "@/interfaces/Uploader"
+import { useDispatch } from "react-redux"
+import { toggleIsLoading, updateImage, updateInfo } from "@/store/DICOM/slice"
 
-type Props = {
-    setImage: Dispatch<SetStateAction<type_image>>
-    setInfo: Dispatch<SetStateAction<type_info>>
-}
 
-export const Uploader: FC<Props> = ({ setImage, setInfo }) => {
+export const Uploader: FC = () => {
+
+    const dispatch = useDispatch()
 
     const [name, setName] = useState(NO_FILE)
 
     const handleChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
+        dispatch(toggleIsLoading())
         const file = e.target.files![0]
         setName(file.name)
+
         const base64String = await readFile(file)
         const base64Image = base64String.split(";base64,").pop();
         const dicomBuffer = Buffer.from(base64Image!, "base64");
@@ -42,21 +43,19 @@ export const Uploader: FC<Props> = ({ setImage, setInfo }) => {
         const institution = dataSet.string("x00080080") || '';
         const station = dataSet.string("x00081010") || '';
         const patientName = dataSet.string("x00100010") || '';
-
-        console.log(dataSet.elements)
-        console.log(Object.values(dataSet.elements).length)
-        Object.keys(dataSet.elements).map(item => {
-            console.log(item)
-        })
-
-
+        const pixelSpacing = dataSet.string("x00181164") || '';
+        
+        // console.log(dataSet.elements)
+        // console.log(Object.values(dataSet.elements).length)
+        // Object.keys(dataSet.elements).map(item => {
+            //     console.log(item)
+            // })
+            
         //DATA FOR EDITOR
         const slope = parseInt(dataSet.string('x00281053') || '1');
         const intercept = parseInt(dataSet.string('x00281052') || '0');
         const windowCenter = parseInt(dataSet.string('x00281050') || '2048')
         const windowWidth = parseInt(dataSet.string('x00281051') || '4096')
-
-        console.log(slope, intercept, windowCenter, windowWidth)
 
         // DATA FROM IMAGE
         const imageWidth = dataSet.uint16("x00280011") || 0;
@@ -66,8 +65,12 @@ export const Uploader: FC<Props> = ({ setImage, setInfo }) => {
         const pixelData = new Uint16Array(
             dataSet.byteArray.buffer, pixelDataElement.dataOffset, pixelDataElement.length / bytesPerPixel);
 
-        setInfo({
+        dispatch(updateInfo({
             KV,
+            sensitivity,
+            date,
+            filter,
+            mode,
             serialNumber,
             version,
             exposure,
@@ -81,10 +84,13 @@ export const Uploader: FC<Props> = ({ setImage, setInfo }) => {
             modality,
             institution,
             station,
-            patientName
-        })
+            patientName,
+            pixelSpacing,
+            imageHeight,
+            imageWidth
+        }))
 
-        setImage({
+        dispatch(updateImage({
             name: file.name,
             imageWidth,
             imageHeight,
@@ -94,8 +100,9 @@ export const Uploader: FC<Props> = ({ setImage, setInfo }) => {
             windowWidth,
             intercept,
             file: file
+        }))
+        dispatch(toggleIsLoading())
 
-        })
     }
 
     return (

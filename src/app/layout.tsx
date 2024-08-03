@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import ThemeRegistry from "@/components/UI/ThemeProvider";
 import { DESCRIPTION, TITLE } from "@/constants/page";
+import { StoreProvider } from "@/store/StoreProvider";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -17,7 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <ThemeRegistry>
+          <StoreProvider>
+            {children}
+          </StoreProvider>
+        </ThemeRegistry>
       </body>
     </html>
   );

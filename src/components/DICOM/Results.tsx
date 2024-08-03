@@ -4,9 +4,17 @@ import { useAppSelector } from '@/store'
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { FC } from 'react'
 
+const ROI_SIZE_mm = 20
+const ROI_NUM = 5
 
-export const Chart: FC = () => {
+export const Results: FC = () => {
+
     const info = useAppSelector(state => state.dicom.info)
+
+    const pixelSpacingWidth = parseFloat(info.pixelSpacing.split('\\')[0])
+    const pixelSpacingHeight = parseFloat(info.pixelSpacing.split('\\')[1])
+    const roiWidth_pixel = ROI_SIZE_mm / pixelSpacingWidth
+    const roiHeight_pixel = ROI_SIZE_mm / pixelSpacingHeight
 
     return (
         <TableContainer component={Paper} elevation={3} sx={{ p: 1 }}>

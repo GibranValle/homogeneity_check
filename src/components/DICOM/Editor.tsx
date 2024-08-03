@@ -1,35 +1,35 @@
 "use client"
 
-import { type_image } from "@/interfaces/Uploader"
-import { Box, Button, Paper, Slider, Typography } from "@mui/material"
+import { useAppSelector } from "@/store"
+import { updateViewport } from "@/store/DICOM/slice"
+import { Box, Paper, Slider, Typography } from "@mui/material"
 import { FC, useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
 
-type Props = {
-    image: type_image
-    updateViewPort: (width: number, center: number) => void
-}
+export const Editor: FC = () => {
 
-export const Editor: FC<Props> = ({ image, updateViewPort }) => {
+    const image = useAppSelector(state => state.dicom.image)
+    const dispatch = useDispatch()
+
     const [center, setCenter] = useState(2048)
     const [width, setWidth] = useState(4096)
 
     const handleChangeWidth = (event: Event, value: number | number[]) => {
         const val = value as number
         setWidth(val)
-        updateViewPort(val, center)
+        dispatch(updateViewport({ windowWidth: val, windowCenter: center }))
 
     }
 
     const handleChangeCenter = (event: Event, value: number | number[]) => {
         const val = value as number
         setCenter(val)
-        updateViewPort(width, val)
-
+        dispatch(updateViewport({ windowWidth: width, windowCenter: val }))
     }
 
     useEffect(() => {
         if (typeof image?.slope === 'undefined') return
-        const { slope, windowCenter, windowWidth, intercept } = image
+        const { windowCenter, windowWidth } = image
         setCenter(windowCenter)
         setWidth(windowWidth)
     }, [image])
