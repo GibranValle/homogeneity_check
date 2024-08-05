@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { FILE_CHANGE, FILE_ERROR, NO_FILE } from "@/constants/file"
 import { readFile } from "@/lib"
@@ -6,21 +6,33 @@ import { Box, Button, Typography } from "@mui/material"
 import { ChangeEvent, FC, useState } from "react"
 import dicomParser from "dicom-parser";
 import { useDispatch } from "react-redux"
-import { toggleIsLoading, updateImage, updateInfo } from "@/store/DICOM/slice"
+import { setImageId, toggleIsLoading, updateImage, updateInfo } from "@/store/DICOM/slice"
+import { useAppSelector } from "@/store"
+import { loadAndViewImageBlob } from "@/lib/initializeCornerstone"
 
 
 export const Uploader: FC = () => {
 
     const dispatch = useDispatch()
-
     const [name, setName] = useState(NO_FILE)
+    const imageId = useAppSelector(state => state.dicom.imageId)
 
     const handleChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
         dispatch(toggleIsLoading())
         const file = e.target.files![0]
+        const loadedImageId = loadAndViewImageBlob(file);
+        dispatch(setImageId(loadedImageId))
         setName(file.name)
 
-        const base64String = await readFile(file)
+
+        // const res = await fetch(API_POST_IMAGE, {
+        //     method: 'POST',
+        //     body: JSON.stringify({ base64String, name: 'newImage.dcm' })
+        // })
+        // // const { dicomPath } = await res.json()
+        // const dicomPath = '/test.dcm'; // Ruta relativa a public
+        // DICOM READ
+        const base64String = await readFile(file) as string
         const base64Image = base64String.split(";base64,").pop();
         const dicomBuffer = Buffer.from(base64Image!, "base64");
         const dataSet = dicomParser.parseDicom(dicomBuffer);
@@ -44,13 +56,13 @@ export const Uploader: FC = () => {
         const station = dataSet.string("x00081010") || '';
         const patientName = dataSet.string("x00100010") || '';
         const pixelSpacing = dataSet.string("x00181164") || '';
-        
+
         // console.log(dataSet.elements)
         // console.log(Object.values(dataSet.elements).length)
         // Object.keys(dataSet.elements).map(item => {
-            //     console.log(item)
-            // })
-            
+        //     console.log(item)
+        // })
+
         //DATA FOR EDITOR
         const slope = parseInt(dataSet.string('x00281053') || '1');
         const intercept = parseInt(dataSet.string('x00281052') || '0');

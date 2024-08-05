@@ -1,4 +1,5 @@
 export * from './Chart'
 export * from './Editor'
-export * from './Viewer'
+export * from './ViewerOld'
 export * from './Results'
+export * from './Viewer'
