@@ -1,0 +1,37 @@
+Lista de Eventos de Cornerstone
+
+1. cornerstoneimagerendered
+   - Descripción: Se dispara cuando una imagen ha sido renderizada.
+   - Datos del Evento: Información sobre la imagen renderizada y el estado del viewport.
+
+2. cornerstonenewimage
+   - Descripción: Se dispara cuando se carga una nueva imagen en el elemento.
+   - Datos del Evento: Información sobre la nueva imagen cargada.
+
+3. cornerstonepreloadimage
+   - Descripción: Se dispara antes de que una imagen sea cargada.
+   - Datos del Evento: Identificador de la imagen que se está cargando.
+
+4. cornerstoneelementenabled
+   - Descripción: Se dispara cuando un elemento de cornerstone es habilitado.
+   - Datos del Evento: Información sobre el elemento habilitado.
+
+5. cornerstoneelementdisabled
+   - Descripción: Se dispara cuando un elemento de cornerstone es deshabilitado.
+   - Datos del Evento: Información sobre el elemento deshabilitado.
+
+6. cornerstonetoolsmousemove
+   - Descripción: Se dispara cuando el ratón se mueve sobre el elemento habilitado.
+   - Datos del Evento: Posición del ratón y la información del elemento.
+
+7. cornerstonetoolsmeasurementadded
+   - Descripción: Se dispara cuando se agrega una nueva medición.
+   - Datos del Evento: Información sobre la medición añadida.
+
+8. cornerstonetoolsmeasurementmodified
+   - Descripción: Se dispara cuando se modifica una medición existente.
+   - Datos del Evento: Información sobre la medición modificada.
+
+9. cornerstonetoolsmeasurementremoved
+   - Descripción: Se dispara cuando se elimina una medición.
+   - Datos del Evento: Información sobre la medición eliminada.

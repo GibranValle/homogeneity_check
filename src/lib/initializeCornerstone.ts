@@ -33,7 +33,7 @@ export const initializeCornerstone = () => {
 	cornerstoneTools.external.cornerstoneMath = cornerstoneMath
 	// Initialize tools
 	cornerstoneTools.init({
-		showSVGCursors: true,
+		showSVGCursors: false,
 	})
 
 	// 	// Add tools

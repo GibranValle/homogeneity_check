@@ -1,0 +1,114 @@
+1. resetViewport
+   Descripción: Resetea el viewport a su configuración inicial, incluyendo el nivel de zoom y el centro.
+
+2. setViewportActiveTool
+   Descripción: Establece la herramienta activa en el viewport.
+   Parámetros:
+     - toolName (string): Nombre de la herramienta a activar.
+
+3. enableStackPrefetch
+   Descripción: Habilita la funcionalidad de prefetching de la pila de imágenes.
+
+4. disableStackPrefetch
+   Descripción: Deshabilita la funcionalidad de prefetching de la pila de imágenes.
+
+5. enable
+   Descripción: Habilita el elemento del visor.
+
+6. disable
+   Descripción: Deshabilita el elemento del visor.
+
+7. addTool
+   Descripción: Añade una herramienta al viewport.
+   Parámetros:
+     - toolName (string): Nombre de la herramienta a añadir.
+     - options (object): Opciones de configuración para la herramienta.
+
+8. removeTool
+   Descripción: Elimina una herramienta del viewport.
+   Parámetros:
+     - toolName (string): Nombre de la herramienta a eliminar.
+
+9. setToolActive
+   Descripción: Establece una herramienta como activa.
+   Parámetros:
+     - toolName (string): Nombre de la herramienta a activar.
+     - options (object): Opciones adicionales para la herramienta activa.
+
+10. setToolPassive
+    Descripción: Establece una herramienta como pasiva.
+    Parámetros:
+      - toolName (string): Nombre de la herramienta a hacer pasiva.
+      - options (object): Opciones adicionales para la herramienta pasiva.
+
+11. setToolEnabled
+    Descripción: Habilita una herramienta en el viewport.
+    Parámetros:
+      - toolName (string): Nombre de la herramienta a habilitar.
+      - options (object): Opciones adicionales para la herramienta habilitada.
+
+12. setToolDisabled
+    Descripción: Deshabilita una herramienta en el viewport.
+    Parámetros:
+      - toolName (string): Nombre de la herramienta a deshabilitar.
+      - options (object): Opciones adicionales para la herramienta deshabilitada.
+
+13. fitToWindow
+    Descripción: Ajusta el contenido de la imagen para que se ajuste a la ventana del viewport.
+
+14. invert
+    Descripción: Invierte los colores de la imagen.
+
+15. rotate
+    Descripción: Rota la imagen.
+    Parámetros:
+      - degrees (number): Grados a rotar la imagen.
+
+16. scale
+    Descripción: Escala la imagen.
+    Parámetros:
+      - scale (number): Factor de escala.
+
+17. translate
+    Descripción: Traslada la imagen.
+    Parámetros:
+      - x (number): Desplazamiento en el eje x.
+      - y (number): Desplazamiento en el eje y.
+
+18. zoom
+    Descripción: Aplica un zoom a la imagen.
+    Parámetros:
+      - factor (number): Factor de zoom.
+
+19. scroll
+    Descripción: Desplaza la pila de imágenes.
+    Parámetros:
+      - frames (number): Número de frames a desplazar.
+
+20. setOverlayRendering
+    Descripción: Establece la configuración de renderizado de superposiciones.
+    Parámetros:
+      - render (boolean): Habilitar o deshabilitar el renderizado de superposiciones.
+
+21. loadImage
+    Descripción: Carga una imagen en el viewport.
+    Parámetros:
+      - imageId (string): Identificador de la imagen a cargar.
+
+22. setImageId
+    Descripción: Establece el ID de la imagen actual.
+    Parámetros:
+      - imageId (string): Identificador de la imagen.
+
+23. getImage
+    Descripción: Obtiene la imagen actual del viewport.
+    Retorna:
+      - image (object): Imagen actual.
+
+24. getEnabledElement
+    Descripción: Obtiene el elemento habilitado del viewport.
+    Retorna:
+      - element (object): Elemento habilitado.
+
+25. updateImage
+    Descripción: Fuerza una actualización de la imagen en el viewport.
