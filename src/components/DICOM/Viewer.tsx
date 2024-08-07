@@ -1,8 +1,7 @@
 "use client"
 import { initializeCornerstone } from '@/lib/initializeCornerstone';
 import { useAppSelector } from '@/store';
-import { CircularProgress } from '@mui/material';
-import React, { FC, useRef } from 'react';
+import React, { FC, useRef, useState } from 'react';
 //@ts-ignore
 import CornerstoneViewport from 'react-cornerstone-viewport'
 import { useDispatch } from 'react-redux';
@@ -10,25 +9,30 @@ import { useDispatch } from 'react-redux';
 import cornerstoneTools from 'cornerstone-tools';
 import { CustomEventType } from '@cornerstonejs/core/dist/types/types';
 import cornerstone from 'cornerstone-core';
+import { setCalcFinished, setElement } from '@/store/DICOM/slice';
+import { commonProps, ROI_1, ROI_2, ROI_3, ROI_4, ROI_5, ROI_6, textBox } from '@/constants/roi';
 
 
-
-
-export const ViewerTest: FC = () => {
+export const Viewer: FC = () => {
     const imageId = useAppSelector(state => state.dicom.imageId)
     const info = useAppSelector(state => state.dicom.info)
+    const [isReady, setIsReady] = useState(false)
 
-    const dispatch = useDispatch()
-    const isLoading = useAppSelector(state => state.dicom.isLoading)
     const viewportRef = useRef(null)
+    const dispatch = useDispatch()
 
     initializeCornerstone()
 
     const handleImageRendered = (event: CustomEventType) => {
+        // last rendering detected!
+        if (isReady) {
+            dispatch(setCalcFinished())
+        }
+        // unlimited renders fixed!
         if (viewportRef.current) return
         const element = event.detail.element;
         viewportRef.current = element
-        // const image = cornerstone.getImage(element)
+        dispatch(setElement(element))
         const { pixelSpacing, imageWidth, imageHeight } = info
         const x_factor = parseFloat(pixelSpacing.split('\\')[0])
         const y_factor = parseFloat(pixelSpacing.split('\\')[1])
@@ -55,163 +59,115 @@ export const ViewerTest: FC = () => {
             mouseButtonMask: 1
         })
 
-        const commonProps = {
-            lineDash: [5, 3],
-            color: 'yellow',
-            invalidated: true,
-            unit: '',
-        }
-
-        const textBox = {
-            active: true,
-            movesIndependently: true,
-            drawnIndependently: true,
-            allowedOutsideImage: true,
-            x: -1000,
-            y: -1000,
-            moving: false,
-            hasBoundingBox: true,
-            boundingBox: {
-                height
-                    :
-                    65,
-                left
-                    :
-                    -1000,
-                top
-                    :
-                    -1000,
-                width
-                    :
-                    150.9033203125
-            }
-        }
-
         const roiToolData = [
             {
                 handles:
                 {
-                    uuid: 'torax-izquierda',
+                    uuid: ROI_1,
                     start: { x: x_left, y: y_top, active: false, moving: false, highlight: true },
                     end: { x: x_left + roi_size_px[0], y: y_top + roi_size_px[1], active: false, moving: false, highlight: true },
                     textBox
                 },
-                ...commonProps
+                ...commonProps,
+                color: 'orange'
             },
             {
                 handles:
                 {
-                    uuid: 'torax-derecha',
-                    initialRotation: 0,
-                    start: { x: x_left, y: y_bottom, active: false, moving: false, highlight: true },
-                    end: { x: x_left + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
-                    textBox,
-                    active: false,
-                    hasMoved: false,
-                    color: 'yellow', // Color del rectángulo
-                },
-                ...commonProps
-            },
-            {
-                handles:
-                {
-                    uuid: 'fondo-izquierda',
+                    uuid: ROI_3,
                     initialRotation: 0,
                     start: { x: x_right, y: y_top, active: false, moving: false, highlight: true },
                     end: { x: x_right + roi_size_px[0], y: y_top + roi_size_px[1], active: false, moving: false, highlight: true },
                     textBox,
                     active: false,
                     hasMoved: false,
-                    color: 'yellow', // Color del rectángulo
                 },
-                ...commonProps
-            },
-            {
-                handles:
-                {
-                    uuid: 'fondo-derecha',
-                    initialRotation: 0,
-                    start: { x: x_right, y: y_bottom, active: false, moving: false, highlight: true },
-                    end: { x: x_right + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
-                    textBox,
-                    active: false,
-                    hasMoved: false,
-                    color: 'yellow', // Color del rectángulo
-                },
-                ...commonProps
+                ...commonProps,
+                color: 'white'
 
             },
             {
                 handles:
                 {
-                    uuid: 'centro',
+                    uuid: ROI_5,
                     initialRotation: 0,
                     start: { x: x_center, y: y_center, active: false, moving: false, highlight: true },
                     end: { x: x_center + roi_size_px[0], y: y_center + roi_size_px[1], active: false, moving: false, highlight: true },
                     textBox,
                     active: false,
                     hasMoved: false,
-                    color: 'yellow', // Color del rectángulo
                 },
-                ...commonProps
+                ...commonProps,
+                color: 'darkGray'
 
             },
             {
                 handles:
                 {
-                    uuid: 'completo',
+                    uuid: ROI_2,
+                    initialRotation: 0,
+                    start: { x: x_left, y: y_bottom, active: false, moving: false, highlight: true },
+                    end: { x: x_left + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
+                    textBox,
+                    active: false,
+                    hasMoved: false,
+                },
+                ...commonProps,
+                color: 'orange'
+
+            },
+
+            {
+                handles:
+                {
+                    uuid: ROI_4,
+                    initialRotation: 0,
+                    start: { x: x_right, y: y_bottom, active: false, moving: false, highlight: true },
+                    end: { x: x_right + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
+                    textBox,
+                    active: false,
+                    hasMoved: false,
+                },
+                ...commonProps,
+                color: 'white'
+
+
+            },
+            {
+                handles:
+                {
+                    uuid: ROI_6,
                     initialRotation: 0,
                     start: { x: x_left, y: y_top, active: false, moving: false, highlight: true },
                     end: { x: image_size_px[0] - roi_offset_px[0], y: image_size_px[1] - roi_offset_px[1], active: false, moving: false, highlight: true },
                     textBox,
                 },
                 ...commonProps,
-                color: 'green'
+                color: 'darkGray'
             },
         ]
 
         roiToolData.map(item => cornerstoneTools.addToolState(element, 'RectangleRoi', item))
-
-        // renderTool.renderToolData = (evt: CustomEventType) => {
-        //     const { eventData } = evt.detail;
-        //     const { handleRadius, color, handleColor } = eventData;
-        //     eventData.toolData.data.forEach((data: any) => {
-        //         data.handles.textBox = null;  // Hide textBox
-        //     });
-
-        //     originalRenderTool(evt);
-        // };
         cornerstone.updateImage(element);
-    }
-
-    const handleMeasured = (event: CustomEventType) => {
-        // return
-        const element = event.detail.element;
-        const b = cornerstoneTools.getToolState(element, 'RectangleRoi')
-        console.log(b)
+        setIsReady(true)
     }
 
 
     return (
         <>
             {
-                imageId ? isLoading ? <CircularProgress /> :
+                imageId ?
                     <CornerstoneViewport
                         viewport
                         // tools={tools}
                         imageIds={[imageId]}
-                        style={{ width: '100%', height: '100%' }}
+                        style={{ height: '100%' }}
                         eventListeners={
                             [
                                 {
                                     target: 'element',
                                     eventName: 'cornerstoneimagerendered',
                                     handler: handleImageRendered
-                                },
-                                {
-                                    target: 'element',
-                                    eventName: 'cornerstonetoolsmeasurementmodified',
-                                    handler: handleMeasured
                                 },
                             ]
                         }

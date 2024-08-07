@@ -35,3 +35,4 @@ Lista de Eventos de Cornerstone
 9. cornerstonetoolsmeasurementremoved
    - Descripción: Se dispara cuando se elimina una medición.
    - Datos del Evento: Información sobre la medición eliminada.
+10.cornerstonetoolsmeasurementcompleted

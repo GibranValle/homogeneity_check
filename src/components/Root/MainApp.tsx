@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Paper } from "@mui/material";
-import { Chart, Editor, Results, Uploader, ViewerTest } from '@/components'
+import { Chart, Editor, Results, Uploader, Viewer } from '@/components'
 
 export default function MainApp() {
 
@@ -36,13 +36,18 @@ export default function MainApp() {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
-                <ViewerTest />
+                <Viewer />
 
             </Box>
-            {/* 
-            <Box component={Paper} elevation={3}>
+
+            <Box sx={{
+                flex: '1 1 100px',
+                display: 'flex',
+                width: '100%',
+                height: '100%'
+            }}>
                 <Results />
-            </Box> */}
+            </Box>
 
         </Box>
     );

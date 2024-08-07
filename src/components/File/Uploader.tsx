@@ -6,8 +6,7 @@ import { Box, Button, Typography } from "@mui/material"
 import { ChangeEvent, FC, useState } from "react"
 import dicomParser from "dicom-parser";
 import { useDispatch } from "react-redux"
-import { setImageId, toggleIsLoading, updateImage, updateInfo } from "@/store/DICOM/slice"
-import { useAppSelector } from "@/store"
+import { setCalcStarted, setImageId, updateImage, updateInfo } from "@/store/DICOM/slice"
 import { loadAndViewImageBlob } from "@/lib/initializeCornerstone"
 
 
@@ -15,16 +14,13 @@ export const Uploader: FC = () => {
 
     const dispatch = useDispatch()
     const [name, setName] = useState(NO_FILE)
-    const imageId = useAppSelector(state => state.dicom.imageId)
 
     const handleChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
-        dispatch(toggleIsLoading())
+        dispatch(setCalcStarted())
         const file = e.target.files![0]
         const loadedImageId = loadAndViewImageBlob(file);
         dispatch(setImageId(loadedImageId))
         setName(file.name)
-
-
         // const res = await fetch(API_POST_IMAGE, {
         //     method: 'POST',
         //     body: JSON.stringify({ base64String, name: 'newImage.dcm' })
@@ -37,13 +33,13 @@ export const Uploader: FC = () => {
         const dicomBuffer = Buffer.from(base64Image!, "base64");
         const dataSet = dicomParser.parseDicom(dicomBuffer);
         const KV = dataSet.string("x00180060") || '';
-        const sensitivity = dataSet.string("x00186000") || '';
+        const exposure = dataSet.string("x00181152") || '';
         const date = dataSet.string("x0018700c") || '';
+        const sensitivity = dataSet.string("x00186000") || '';
         const filter = dataSet.string("x00187050") || '';
         const mode = dataSet.string("x00187060") || '';
         const serialNumber = dataSet.string("x00181000") || '';
         const version = dataSet.string("x00181020") || '';
-        const exposure = dataSet.string("x00181152") || '';
         const grid = dataSet.string("x00181166") || '';
         const anode = dataSet.string("x00181191") || '';
         const thickness = dataSet.string("x001811a0") || '';
@@ -113,8 +109,6 @@ export const Uploader: FC = () => {
             intercept,
             file: file
         }))
-        dispatch(toggleIsLoading())
-
     }
 
     return (
