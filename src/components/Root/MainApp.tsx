@@ -1,53 +1,40 @@
 "use client"
 
 import { Box, Paper } from "@mui/material";
-import { Chart, Editor, Results, Uploader, Viewer } from '@/components'
+import { Card, Chart, Editor, Results, Uploader, Viewer } from '@/components'
+import { ReactNode } from "react";
+
+type Props = {
+    children: ReactNode
+}
 
 export default function MainApp() {
 
     return (
-        <Box component={Paper}
-            sx={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                p: 2,
-                gap: 2,
-                alignItems: 'start',
-            }}>
-            <Box sx={{
-                display: 'flex',
-                width: '100%',
-                flexDirection: 'column',
-                justifyContent: 'start',
-                flex: '0 1 450px',
-                gap: 2,
-            }}>
+        <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            flexWrap: 'wrap',
+            padding: 2,
+            gap: 2
+        }}>
+
+            <Card>
                 <Uploader />
                 <Chart />
                 <Editor />
-            </Box>
+            </Card>
 
-            <Box component={Paper} elevation={3}
-                sx={{
-                    height: '100%',
-                    flex: '1 1 100px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}>
+            <Card>
                 <Viewer />
+            </Card>
 
-            </Box>
-
-            <Box sx={{
-                flex: '1 1 100px',
-                display: 'flex',
-                width: '100%',
-                height: '100%'
-            }}>
+            <Card>
                 <Results />
-            </Box>
+            </Card>
 
         </Box>
     );

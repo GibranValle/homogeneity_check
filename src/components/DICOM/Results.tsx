@@ -85,7 +85,13 @@ export const Results: FC = () => {
     }, [linealStatistics])
 
     if (calcFinished && isReady) return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
+        <Box sx={{
+            flex: '1 1 100px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+            justifyContent: 'space-around'
+        }}>
             <NoLineal statistics={statistics} />
             <Lineal statistics={linealStatistics} a={a} b={b} handleTextChange={handleTextChange} calcData={handleClick} />
             <Final statistics={results} />
@@ -93,7 +99,13 @@ export const Results: FC = () => {
     )
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+        <Box sx={{
+            flex: '1 1 100px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}>
             {
                 calcStarted ? <CircularProgress color='secondary' thickness={10} size={200} sx={{
                     animationDuration: '1000ms',

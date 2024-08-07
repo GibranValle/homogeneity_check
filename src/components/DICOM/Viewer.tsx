@@ -11,6 +11,8 @@ import { CustomEventType } from '@cornerstonejs/core/dist/types/types';
 import cornerstone from 'cornerstone-core';
 import { setCalcFinished, setElement } from '@/store/DICOM/slice';
 import { commonProps, ROI_1, ROI_2, ROI_3, ROI_4, ROI_5, ROI_6, textBox } from '@/constants/roi';
+import { ERROR_IMAGE } from '@/constants/tables';
+import { Box, Typography } from '@mui/material';
 
 
 export const Viewer: FC = () => {
@@ -157,27 +159,27 @@ export const Viewer: FC = () => {
         setIsReady(true)
     }
 
+    if (imageId) return (
+        <CornerstoneViewport
+            viewport
+            // tools={tools}
+            imageIds={[imageId]}
+            style={{ flex: '1 1 100px' }}
+            eventListeners={
+                [
+                    {
+                        target: 'element',
+                        eventName: 'cornerstoneimagerendered',
+                        handler: handleImageRendered
+                    },
+                ]
+            }
+        />
+    )
 
     return (
-        <>
-            {
-                imageId ?
-                    <CornerstoneViewport
-                        viewport
-                        // tools={tools}
-                        imageIds={[imageId]}
-                        style={{ height: '100%' }}
-                        eventListeners={
-                            [
-                                {
-                                    target: 'element',
-                                    eventName: 'cornerstoneimagerendered',
-                                    handler: handleImageRendered
-                                },
-                            ]
-                        }
-                    /> : <></>
-            }
-        </>
+        <Box sx={{ flex: '1 1 100px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Typography align='center' color={'red'} variant='h2'>{ERROR_IMAGE}</Typography>
+        </Box>
     )
 }
