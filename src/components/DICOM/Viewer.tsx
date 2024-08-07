@@ -16,6 +16,8 @@ import { commonProps, ROI_1, ROI_2, ROI_3, ROI_4, ROI_5, ROI_6, textBox } from '
 export const Viewer: FC = () => {
     const imageId = useAppSelector(state => state.dicom.imageId)
     const info = useAppSelector(state => state.dicom.info)
+    const updater = useAppSelector(state => state.dicom.updater)
+
     const [isReady, setIsReady] = useState(false)
 
     const viewportRef = useRef(null)
@@ -24,6 +26,9 @@ export const Viewer: FC = () => {
     initializeCornerstone()
 
     const handleImageRendered = (event: CustomEventType) => {
+        if (!updater) {
+
+        }
         // last rendering detected!
         if (isReady) {
             dispatch(setCalcFinished())

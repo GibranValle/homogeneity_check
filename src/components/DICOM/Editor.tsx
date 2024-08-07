@@ -1,7 +1,7 @@
 "use client"
 
 import { useAppSelector } from "@/store"
-import { updateViewport } from "@/store/DICOM/slice"
+// import { updateViewport } from "@/store/DICOM/slice"
 import { Box, Button, Paper, Slider, Typography } from "@mui/material"
 import { FC, useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -28,8 +28,16 @@ export const Editor: FC = () => {
         cornerstone.updateImage(element);
     }
 
+    const updateViewport = (windowWidth: number, windowCenter: number) => {
+        let viewport = cornerstone.getViewport(element)
+        if (!viewport) return
+        viewport.voi.windowWidth = windowWidth
+        viewport.voi.windowCenter = windowCenter
+        cornerstone.setViewport(element, viewport)
+    }
+
     const triggerChange = (w: number = width, c: number = center) => {
-        dispatch(updateViewport({ windowWidth: w, windowCenter: c }))
+        updateViewport(w, c)
     }
 
     const handleChangeWidth = (event: Event, value: number | number[]) => {

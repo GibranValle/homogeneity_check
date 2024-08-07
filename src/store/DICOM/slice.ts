@@ -1,8 +1,6 @@
 'use client'
-import { type_editor } from '@/interfaces/Editor'
 import { EMPTY_IMAGE, EMPTY_INFO, type_image, type_info } from '@/interfaces/Uploader'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import cornerstone from 'cornerstone-core'
 
 type DICOMState = {
 	image: type_image
@@ -12,6 +10,7 @@ type DICOMState = {
 	element: any
 	calcFinished: boolean
 	calcStarted: boolean
+	updater: any
 }
 
 const initialState: DICOMState = {
@@ -22,6 +21,7 @@ const initialState: DICOMState = {
 	element: null,
 	calcFinished: false,
 	calcStarted: false,
+	updater: null,
 }
 
 const slice = createSlice({
@@ -46,17 +46,9 @@ const slice = createSlice({
 		updateInfo: (state, action: PayloadAction<type_info>) => {
 			state.info = action.payload
 		},
-		updateViewport: (state, action: PayloadAction<type_editor>) => {
-			let viewport = cornerstone.getViewport(state.element)
-			if (!viewport) return
-			const { windowCenter, windowWidth } = action.payload
-			viewport.voi.windowWidth = windowWidth
-			viewport.voi.windowCenter = windowCenter
-			cornerstone.setViewport(state.element, viewport)
-		},
 	},
 })
 
-export const { updateImage, updateInfo, updateViewport, setImageId, setElement, setCalcFinished, setCalcStarted } = slice.actions
+export const { updateImage, updateInfo, setImageId, setElement, setCalcFinished, setCalcStarted } = slice.actions
 
 export default slice.reducer

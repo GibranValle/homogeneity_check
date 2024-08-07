@@ -1,3 +1,4 @@
+'use client'
 // src/cornerstoneConfig.ts
 import cornerstone from 'cornerstone-core'
 //@ts-ignore
@@ -67,3 +68,5 @@ export async function loadAndViewImageFile(file: File) {
 	console.log(imageId)
 	return imageId
 }
+
+export const cs = cornerstone
