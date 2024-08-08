@@ -143,6 +143,8 @@ export const Editor: FC = () => {
 
             </Box>
 
+            <Typography sx={{ mt: 1 }} variant="h3" color={'gray'}>FFMX - GibranValle</Typography>
+
         </Box>
     )
 }
