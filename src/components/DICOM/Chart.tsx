@@ -32,7 +32,7 @@ export const Chart: FC = () => {
                                     <TableCell>
                                         <Typography align='right' >{item[0].toUpperCase()}</Typography>
                                     </TableCell>
-                                    <TableCell sx={{ minWidth: 300 }}>
+                                    <TableCell sx={{ minWidth: 150 }}>
                                         <Typography align='left' variant='h6'>{item[1]}</Typography>
                                     </TableCell>
                                 </TableRow>

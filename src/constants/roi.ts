@@ -2,10 +2,11 @@ export const commonProps = {
 	lineDash: [5, 3],
 	invalidated: true,
 	unit: '',
+	active: false,
 }
 
 export const textBox = {
-	active: true,
+	active: false,
 	movesIndependently: true,
 	drawnIndependently: true,
 	allowedOutsideImage: true,

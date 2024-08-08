@@ -60,11 +60,6 @@ export const Viewer: FC = () => {
         x_center = image_size_px[0] / 2 - roi_offset_px[0] + roi_size_px[0] / 2
         y_center = image_size_px[1] / 2 - roi_offset_px[1] + roi_size_px[0] / 2
 
-        const RectangleRoiTool = cornerstoneTools.RectangleRoiTool;
-        cornerstoneTools.addTool(RectangleRoiTool);
-        cornerstoneTools.setToolPassive('RectangleRoi', {
-            mouseButtonMask: 1
-        })
 
         const roiToolData = [
             {

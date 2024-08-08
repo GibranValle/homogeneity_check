@@ -32,10 +32,32 @@ export const initializeCornerstone = () => {
 	cornerstoneTools.external.dicomParser = dicomParser
 	cornerstoneTools.external.Hammer = Hammer
 	cornerstoneTools.external.cornerstoneMath = cornerstoneMath
+
 	// Initialize tools
 	cornerstoneTools.init({
-		showSVGCursors: false,
+		showSVGCursors: true,
 	})
+
+	const fontFamily =
+		'Work Sans, Roboto, OpenSans, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif'
+
+	cornerstoneTools.textStyle.setFont(`16px ${fontFamily}`)
+
+	// Set the tool width
+	cornerstoneTools.toolStyle.setToolWidth(2)
+
+	// tools declaration
+	const MagnifyTool = cornerstoneTools.MagnifyTool
+	const PanTool = cornerstoneTools.PanTool
+	const RectangleRoiTool = cornerstoneTools.RectangleRoiTool
+
+	cornerstoneTools.addTool(MagnifyTool)
+	cornerstoneTools.addTool(PanTool)
+	cornerstoneTools.addTool(RectangleRoiTool)
+
+	cornerstoneTools.setToolActive('Magnify', { mouseButtonMask: 1 })
+	cornerstoneTools.setToolActive('Pan', { mouseButtonMask: 2 })
+	cornerstoneTools.setToolEnabled('RectangleRoi')
 
 	// 	// Add tools
 	// 	cornerstoneTools.addTool(cornerstoneTools.RectangleRoiTool)

@@ -22,17 +22,17 @@ export default function MainApp() {
             gap: 2
         }}>
 
-            <Card>
+            <Card maxWidth={500}>
                 <Uploader />
                 <Chart />
                 <Editor />
             </Card>
 
-            <Card>
+            <Card proportion={3}>
                 <Viewer />
             </Card>
 
-            <Card>
+            <Card proportion={3}>
                 <Results />
             </Card>
 

@@ -3,18 +3,20 @@ import { ReactNode } from "react"
 
 type Props = {
     children: ReactNode
+    proportion?: number
+    maxWidth?: number
 }
-export const Card = ({ children }: Props) => {
+export const Card = ({ children, proportion = 1, maxWidth = 700 }: Props) => {
     return (
         <Box sx={{
-            flex: '1 1 100px',
-            maxWidth: 700,
+            flex: `${proportion} 1 100px`,
+            maxWidth,
             maxHeight: 1300,
             backgroundColor: 'black',
             display: 'flex',
             flexDirection: 'column',
             gap: 2,
-            minWidth: 500,
+            minWidth: 100,
             minHeight: 900
         }}>
             {children}
