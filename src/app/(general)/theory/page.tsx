@@ -1,4 +1,3 @@
-"use client"
 import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { GLOSSARY, IMPORTANCE, METHODOLOGY, REFERENCES, ROI } from '@/constants/theory';
