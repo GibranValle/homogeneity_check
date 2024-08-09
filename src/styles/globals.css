@@ -12,16 +12,22 @@ body {
 
 body {
 	height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 th {
-	padding: 10px !important;
+	padding: 5px !important;
 	border: none !important;
 }
 
 td {
-	padding: 0px 5px !important;
+	padding: 2px 5px !important;
 	border: none !important;
+}
+
+a {
+	text-decoration: none;
 }
 
 .MuiSlider-markLabel {

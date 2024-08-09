@@ -29,10 +29,10 @@ export const Chart: FC = () => {
                         Object.entries(info).map((item, index) => {
                             return (
                                 <TableRow key={`${index}`} sx={{ display: skip.includes(item[0]) ? 'none' : 'auto' }}>
-                                    <TableCell>
+                                    <TableCell sx={{ p: '0px 2px !important' }}>
                                         <Typography align='right' >{item[0].toUpperCase()}</Typography>
                                     </TableCell>
-                                    <TableCell sx={{ minWidth: 150 }}>
+                                    <TableCell sx={{ minWidth: 150, p: '0px 2px !important' }}>
                                         <Typography align='left' variant='h6'>{item[1]}</Typography>
                                     </TableCell>
                                 </TableRow>

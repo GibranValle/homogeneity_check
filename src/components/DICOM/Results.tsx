@@ -104,7 +104,7 @@ export const Results: FC = () => {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
         }}>
             {
                 calcStarted ? <CircularProgress color='secondary' thickness={10} size={200} sx={{

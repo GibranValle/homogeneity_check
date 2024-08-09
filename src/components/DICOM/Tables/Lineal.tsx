@@ -17,10 +17,10 @@ export const Lineal = ({ statistics, a, b, handleTextChange, calcData }: Props) 
 
     return (
         <Box sx={{ flexDirection: 'column', display: 'flex' }}>
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-around', gap: 1, p: 1, mb: 1 }}>
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-around', gap: 2, p: 1, mb: 1 }}>
                 <TextField sx={{ flex: '1 1 100px' }} label={LABEL_A} variant='filled' id='a' value={a} onChange={handleTextChange} />
                 <TextField sx={{ flex: '1 1 100px' }} label={LABEL_B} variant='filled' id='b' value={b} onChange={handleTextChange} />
-                <Button variant='contained' color='secondary' onClick={calcData}>{BUTTON_CALC}</Button>
+                <Button sx={{ flex: ' 1 1 100px' }} variant='contained' color='secondary' onClick={calcData}>{BUTTON_CALC}</Button>
             </Box>
 
             <TableContainer component={Paper} elevation={3} sx={{ p: 1 }}>

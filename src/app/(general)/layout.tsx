@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
-import "../styles/globals.css";
+import "@/styles/globals.css";
 import ThemeRegistry from "@/components/UI/ThemeProvider";
 import { DESCRIPTION, TITLE } from "@/constants/page";
 import { StoreProvider } from "@/store/StoreProvider";
+import { Navbar } from "@/components";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body>
         <ThemeRegistry>
           <StoreProvider>
+            <Navbar />
             {children}
           </StoreProvider>
         </ThemeRegistry>

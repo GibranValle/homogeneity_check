@@ -1,12 +1,7 @@
 "use client"
 
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import { Card, Chart, Editor, Results, Uploader, Viewer } from '@/components'
-import { ReactNode } from "react";
-
-type Props = {
-    children: ReactNode
-}
 
 export default function MainApp() {
 
@@ -14,25 +9,27 @@ export default function MainApp() {
         <Box sx={{
             display: 'flex',
             justifyContent: 'space-around',
-            alignItems: 'center',
-            width: '100%',
-            height: '100%',
+            alignItems: {
+                xs: 'start',
+                md: 'center'
+            },
             flexWrap: 'wrap',
             padding: 2,
-            gap: 2
+            gap: 2,
+            height: '100%',
         }}>
 
-            <Card maxWidth={500}>
+            <Card minWidth={450} maxWidth={450}>
                 <Uploader />
                 <Chart />
                 <Editor />
             </Card>
 
-            <Card proportion={3}>
+            <Card proportion={4}>
                 <Viewer />
             </Card>
 
-            <Card proportion={3}>
+            <Card proportion={2}>
                 <Results />
             </Card>
 

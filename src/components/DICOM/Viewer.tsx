@@ -57,9 +57,8 @@ export const Viewer: FC = () => {
         y_top = roi_offset_px[1]
         x_right = image_size_px[0] - roi_offset_px[0] - roi_size_px[0]
         y_bottom = image_size_px[1] - roi_offset_px[1] - roi_size_px[1]
-        x_center = image_size_px[0] / 2 - roi_offset_px[0] + roi_size_px[0] / 2
-        y_center = image_size_px[1] / 2 - roi_offset_px[1] + roi_size_px[0] / 2
-
+        x_center = (image_size_px[0] - roi_offset_px[0] - roi_size_px[0]) / 2
+        y_center = (image_size_px[1] - roi_offset_px[1] - roi_size_px[0]) / 2
 
         const roiToolData = [
             {

@@ -111,7 +111,8 @@ export const Editor: FC = () => {
                     {`Window center: ${center}`}
                 </Typography>
                 <Slider sx={{
-                    p: 2
+                    p: 2,
+                    width: '90%',
                 }} max={4096} min={0} value={center} onChange={handleChangeCenter} />
             </Box>
 
@@ -120,7 +121,8 @@ export const Editor: FC = () => {
                     {`Window width: ${width}`}
                 </Typography>
                 <Slider sx={{
-                    p: 2
+                    p: 2,
+                    width: '90%',
                 }} value={width} max={4096} min={0} onChange={handleChangeWidth} />
             </Box>
 
@@ -140,11 +142,7 @@ export const Editor: FC = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-around', width: '100%', gap: 2, mt: 1 }}>
                 <Button fullWidth variant="contained" onClick={handleCenter}><ControlCameraIcon /> Centrar</Button>
-
             </Box>
-
-            <Typography sx={{ mt: 1 }} variant="h3" color={'gray'}>FFMX - GibranValle</Typography>
-
         </Box>
     )
 }
