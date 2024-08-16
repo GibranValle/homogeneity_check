@@ -1,7 +1,7 @@
 "use client"
 import { initializeCornerstone } from '@/lib/initializeCornerstone';
 import { useAppSelector } from '@/store';
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useRef } from 'react';
 //@ts-ignore
 import CornerstoneViewport from 'react-cornerstone-viewport'
 import { useDispatch } from 'react-redux';
@@ -9,32 +9,65 @@ import { useDispatch } from 'react-redux';
 import cornerstoneTools from 'cornerstone-tools';
 import { CustomEventType } from '@cornerstonejs/core/dist/types/types';
 import cornerstone from 'cornerstone-core';
-import { setCalcFinished, setElement } from '@/store/DICOM/slice';
+import { setElement, updateStatistics } from '@/store/DICOM/slice';
 import { commonProps, ROI_1, ROI_2, ROI_3, ROI_4, ROI_5, ROI_6, textBox } from '@/constants/roi';
 import { ERROR_IMAGE } from '@/constants/tables';
-import { Box, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { stats } from '@/interfaces';
+import { QUICK_GUIDE } from '@/constants';
+import { relative } from 'path';
 
 
 export const Viewer: FC = () => {
     const imageId = useAppSelector(state => state.dicom.imageId)
+    const statistics = useAppSelector(state => state.dicom.statistics)
+
     const info = useAppSelector(state => state.dicom.info)
-    const updater = useAppSelector(state => state.dicom.updater)
-
-    const [isReady, setIsReady] = useState(false)
-
     const viewportRef = useRef(null)
     const dispatch = useDispatch()
 
     initializeCornerstone()
 
-    const handleImageRendered = (event: CustomEventType) => {
-        if (!updater) {
+    const calcData = async () => {
+        if (!viewportRef.current) return
+        const temp: any[] = []
+        const state = cornerstoneTools.getToolState(viewportRef.current, 'RectangleRoi')
+        const image = await cornerstone.loadImage(imageId)
+        state.data.map((measurementData: any) => {
+            const { color, handles } = measurementData
+            const { start, end, uuid } = handles
+            const { width, height } = image
+            const { rows, columns } = image
+            // Convertir las coordenadas a índices dentro de la imagen
+            const startX = Math.max(Math.floor(start.x), 0)
+            const startY = Math.max(Math.floor(start.y), 0)
+            const endX = Math.min(Math.floor(end.x), columns)
+            const endY = Math.min(Math.floor(end.y), rows)
+            let sum = 0
+            let sumSquared = 0
+            let count = 0
 
-        }
-        // last rendering detected!
-        if (isReady) {
-            dispatch(setCalcFinished())
-        }
+            // Iterar sobre los píxeles dentro del ROI
+            for (let y = startY; y < endY; y++) {
+                for (let x = startX; x < endX; x++) {
+                    const pixelValue = image.getPixelData()[y * width + x]
+                    sum += pixelValue
+                    sumSquared += pixelValue * pixelValue
+                    count++
+                }
+            }
+
+            const mean = sum / count
+            const variance = sumSquared / count - mean * mean
+            const stdDev = Math.sqrt(variance)
+            const a: stats = { id: uuid, mean, stdDev, color }
+            // stats.push({ id: uuid, mean, stdDev })
+            temp.push(a)
+        })
+        dispatch(updateStatistics(temp))
+    }
+
+    const handleImageRendered = async (event: CustomEventType) => {
         // unlimited renders fixed!
         if (viewportRef.current) return
         const element = event.detail.element;
@@ -150,30 +183,52 @@ export const Viewer: FC = () => {
 
         roiToolData.map(item => cornerstoneTools.addToolState(element, 'RectangleRoi', item))
         cornerstone.updateImage(element);
-        setIsReady(true)
+        await calcData()
     }
 
     if (imageId) return (
-        <CornerstoneViewport
-            viewport
-            // tools={tools}
-            imageIds={[imageId]}
-            style={{ flex: '1 1 100px' }}
-            eventListeners={
-                [
-                    {
-                        target: 'element',
-                        eventName: 'cornerstoneimagerendered',
-                        handler: handleImageRendered
-                    },
-                ]
+        <Box sx={{ position: 'relative', flex: '1 1 100px' }}>
+            <CornerstoneViewport
+                viewport
+                // tools={tools}
+                imageIds={[imageId]}
+                style={{ height: '100%' }}
+                eventListeners={
+                    [
+                        {
+                            target: 'element',
+                            eventName: 'cornerstoneimagerendered',
+                            handler: handleImageRendered
+                        },
+                    ]
+                }
+            />
+            {
+                statistics.length === 0 ?
+                    <CircularProgress
+                        thickness={7} // Aumenta el grosor de la línea
+                        size={200} // Aumenta el tamaño del círculo de progreso
+                        color='secondary'
+                        sx={{
+                            position: 'absolute',
+                            zIndex: 1,
+                            top: '40%',
+                            left: '40%',
+                        }} /> : <></>
             }
-        />
+        </Box>
     )
 
     return (
         <Box sx={{ flex: '1 1 100px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Typography align='center' color={'red'} variant='h2'>{ERROR_IMAGE}</Typography>
+            <>
+                {
+                    QUICK_GUIDE.map((value, index) => (
+                        <Typography sx={{ my: 0.5 }} align='justify' variant='h5' key={`qg-${index}`}>{value}</Typography>
+                    ))
+                }
+            </>
         </Box>
     )
 }

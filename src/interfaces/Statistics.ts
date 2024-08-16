@@ -3,8 +3,6 @@ export interface stats {
 	id: string
 	mean: number
 	stdDev: number
-	min?: number
-	max?: number
 }
 
 export interface linealStats {

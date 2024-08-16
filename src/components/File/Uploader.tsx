@@ -6,7 +6,7 @@ import { Box, Button, Typography } from "@mui/material"
 import { ChangeEvent, FC, useState } from "react"
 import dicomParser from "dicom-parser";
 import { useDispatch } from "react-redux"
-import { setCalcStarted, setImageId, updateImage, updateInfo } from "@/store/DICOM/slice"
+import { setImageId, updateImage, updateInfo } from "@/store/DICOM/slice"
 import { loadAndViewImageBlob } from "@/lib/initializeCornerstone"
 
 
@@ -16,7 +16,6 @@ export const Uploader: FC = () => {
     const [name, setName] = useState(NO_FILE)
 
     const handleChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
-        dispatch(setCalcStarted())
         const file = e.target.files![0]
         const loadedImageId = loadAndViewImageBlob(file);
         dispatch(setImageId(loadedImageId))

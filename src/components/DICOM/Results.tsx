@@ -1,7 +1,5 @@
 "use client"
 //@ts-ignore
-import cornerstoneTools from 'cornerstone-tools';
-
 import { useAppSelector } from '@/store'
 import { ChangeEvent, FC, useEffect, useState } from 'react'
 import React from 'react';
@@ -11,10 +9,10 @@ import { linealStats, results, stats } from '@/interfaces/Statistics';
 import { ERROR_IMAGE } from '@/constants/tables';
 
 export const Results: FC = () => {
-    const calcFinished = useAppSelector(state => state.dicom.calcFinished)
-    const calcStarted = useAppSelector(state => state.dicom.calcStarted)
-    const element = useAppSelector(state => state.dicom.element)
-    const [statistics, setStatistics] = useState<stats[]>([])
+    const statistics = useAppSelector(state => state.dicom.statistics)
+    const imageId = useAppSelector(state => state.dicom.imageId)
+
+    const [nonLinearStats, setNonLinearStats] = useState<stats[]>([])
     const [linealStatistics, setLinealStatistics] = useState<linealStats[]>([])
     const [results, setResults] = useState<results[]>([])
     const [isReady, setIsReady] = useState(false)
@@ -33,7 +31,7 @@ export const Results: FC = () => {
 
     const calcData = () => {
         const newStatistics: linealStats[] = []
-        statistics.map((item, index) => {
+        nonLinearStats.map((item, index) => {
             const vmp = Math.exp(((item.mean) - b) / a)
             const dtp = vmp * item.stdDev / a
             newStatistics.push({ roi: index + 1, id: item.id, vmp, dtp, color: item.color })
@@ -63,28 +61,23 @@ export const Results: FC = () => {
     }
 
     useEffect(() => {
-        if (!calcFinished && !element) return
-        const temp: any = []
-        const state = cornerstoneTools.getToolState(element, 'RectangleRoi')
-        state.data.map((item: any) => {
-            temp.push({ ...item.cachedStats, id: item.handles.uuid, color: item.color })
-        })
-        setStatistics(temp)
-    }, [calcFinished, element])
-
-    useEffect(() => {
-        if (!calcFinished) return
-        calcData()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (!statistics) return
+        setNonLinearStats(statistics)
     }, [statistics])
 
     useEffect(() => {
-        if (!calcFinished) return
+        if (!statistics) return
+        calcData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nonLinearStats])
+
+    useEffect(() => {
+        if (!nonLinearStats) return
         calcResults()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [linealStatistics])
 
-    if (calcFinished && isReady) return (
+    if (statistics.length > 0 && isReady) return (
         <Box sx={{
             flex: '1 1 100px',
             display: 'flex',
@@ -92,26 +85,30 @@ export const Results: FC = () => {
             gap: 1,
             justifyContent: 'space-around'
         }}>
-            <NoLineal statistics={statistics} />
+            <NoLineal statistics={nonLinearStats} />
             <Lineal statistics={linealStatistics} a={a} b={b} handleTextChange={handleTextChange} calcData={handleClick} />
             <Final statistics={results} />
         </Box>
     )
 
+    if (imageId) return (
+        <Box sx={{ position: 'relative', flex: '1 1 100px' }}>
+            <CircularProgress
+                thickness={7} // Aumenta el grosor de la línea
+                size={200} // Aumenta el tamaño del círculo de progreso
+                color='secondary'
+                sx={{
+                    position: 'absolute',
+                    zIndex: 1,
+                    top: '40%',
+                    left: '40%',
+                }} />
+        </Box>
+    )
+
     return (
-        <Box sx={{
-            flex: '1 1 100px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-        }}>
-            {
-                calcStarted ? <CircularProgress color='secondary' thickness={10} size={200} sx={{
-                    animationDuration: '1000ms',
-                }} /> :
-                    <Typography align='center' color={'red'} variant='h2'>{ERROR_IMAGE}</Typography>
-            }
+        <Box sx={{ flex: '1 1 100px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Typography align='center' color={'red'} variant='h2'>{ERROR_IMAGE}</Typography>
         </Box>
     )
 }

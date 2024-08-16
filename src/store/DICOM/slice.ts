@@ -1,27 +1,22 @@
 'use client'
-import { EMPTY_IMAGE, EMPTY_INFO, type_image, type_info } from '@/interfaces/Uploader'
+
+import { stats, EMPTY_IMAGE, EMPTY_INFO, type_image, type_info } from '@/interfaces'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type DICOMState = {
 	image: type_image
 	info: type_info
 	imageId: string
-	statistics: any
+	statistics: stats[]
 	element: any
-	calcFinished: boolean
-	calcStarted: boolean
-	updater: any
 }
 
 const initialState: DICOMState = {
 	image: EMPTY_IMAGE,
 	info: EMPTY_INFO,
 	imageId: '',
-	statistics: null,
+	statistics: [],
 	element: null,
-	calcFinished: false,
-	calcStarted: false,
-	updater: null,
 }
 
 const slice = createSlice({
@@ -31,14 +26,11 @@ const slice = createSlice({
 		setImageId: (state, action: PayloadAction<string>) => {
 			state.imageId = action.payload
 		},
-		setCalcFinished: (state) => {
-			state.calcFinished = true
-		},
-		setCalcStarted: (state) => {
-			state.calcStarted = true
-		},
 		setElement: (state, action: PayloadAction<any>) => {
 			state.element = action.payload
+		},
+		updateStatistics: (state, action: PayloadAction<any[]>) => {
+			state.statistics = action.payload
 		},
 		updateImage: (state, action: PayloadAction<type_image>) => {
 			state.image = action.payload
@@ -49,6 +41,6 @@ const slice = createSlice({
 	},
 })
 
-export const { updateImage, updateInfo, setImageId, setElement, setCalcFinished, setCalcStarted } = slice.actions
+export const { updateImage, updateInfo, updateStatistics, setImageId, setElement } = slice.actions
 
 export default slice.reducer

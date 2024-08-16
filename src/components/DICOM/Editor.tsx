@@ -9,12 +9,14 @@ import cornerstone from 'cornerstone-core';
 import SearchIcon from '@mui/icons-material/Search';
 import ControlCameraIcon from '@mui/icons-material/ControlCamera';
 import { ZOOM_LIST } from "@/constants/tools"
+import { stats } from "@/interfaces";
 
 export const Editor: FC = () => {
 
     const image = useAppSelector(state => state.dicom.image)
-
     const element = useAppSelector(state => state.dicom.element)
+    const statistics = useAppSelector(state => state.dicom.statistics)
+
     const [bestCenter, setBestCenter] = useState<number>(2048)
     const [bestWidth, setBestWidth] = useState<number>(4096)
 
@@ -56,7 +58,6 @@ export const Editor: FC = () => {
     const updateTranslation = (x: number, y: number) => {
         let viewport = cornerstone.getViewport(element)
         if (!viewport) return
-        console.log(viewport)
         viewport.translation.x = x;
         viewport.translation.y = y;
         cornerstone.setViewport(element, viewport)
@@ -81,18 +82,18 @@ export const Editor: FC = () => {
     }
 
     useEffect(() => {
-        if (!element) return
-        if (typeof image?.slope === 'undefined') return
+        if (statistics.length === 0 || !image) return
         setOriginalValues([image.windowCenter, image.windowWidth])
-        const state = cornerstoneTools.getToolState(element, 'RectangleRoi')
-        const stats = state.data.find((item: any) => item.handles.uuid === 'Completo')
-        const c = stats.cachedStats.mean
-        const w = stats.cachedStats.mean * stats.cachedStats.stdDev / 100
+        const stats = statistics.find((item: stats) => item.id === 'Completo')
+        if (!stats) return
+        const c = stats.mean
+        const w = stats.mean * stats.stdDev / 100
+        setWidth(w)
+        setCenter(c)
         setBestCenter(c)
         setBestWidth(w)
-    }, [image, element])
-
-
+        triggerChange(w, c)
+    }, [statistics])
 
     return (
         <Box
