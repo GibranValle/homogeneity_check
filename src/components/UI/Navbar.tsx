@@ -4,7 +4,8 @@ import Link from "next/link"
 import { usePathname } from 'next/navigation'
 
 const NAVIGATION = [
-    { name: 'Herramienta', path: '/' },
+    { name: 'Homogeneidad', path: '/' },
+    { name: 'Colimación', path: '/collimation' },
     { name: 'Teoría', path: '/theory' },
     { name: 'Acerca de', path: '/about' }
 

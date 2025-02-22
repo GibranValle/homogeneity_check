@@ -1,9 +1,9 @@
 'use client'
 
 import { Box } from '@mui/material'
-import { Card, Chart, Editor, FinalResults, Uploader, Viewer } from '@/components'
+import { Card, Chart, CollimationResults, CollimationViewer, Editor, Uploader } from '@/components'
 
-export default function MainApp() {
+export default function Collimation() {
 	return (
 		<Box
 			sx={{
@@ -21,16 +21,12 @@ export default function MainApp() {
 		>
 			<Card minWidth={450} maxWidth={450}>
 				<Uploader />
-				<Chart />
 				<Editor />
-			</Card>
-
-			<Card proportion={2}>
-				<FinalResults />
+				<CollimationResults />
 			</Card>
 
 			<Card proportion={4}>
-				<Viewer />
+				<CollimationViewer />
 			</Card>
 		</Box>
 	)

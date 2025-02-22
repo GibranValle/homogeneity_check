@@ -9,15 +9,14 @@ import { useDispatch } from 'react-redux'
 import cornerstoneTools from 'cornerstone-tools'
 import { CustomEventType } from '@cornerstonejs/core/dist/types/types'
 import cornerstone from 'cornerstone-core'
-import { setElement, updateStatistics } from '@/store/DICOM/slice'
+import { setElement, setInnerRoi, updateStatistics } from '@/store/DICOM/slice'
 import { commonProps, ROI_1, ROI_2, ROI_3, ROI_4, ROI_5, ROI_6, textBox } from '@/constants/roi'
 import { ERROR_IMAGE } from '@/constants/tables'
-import { Box, CircularProgress, Typography } from '@mui/material'
+import { Box, CircularProgress, Paper, Typography } from '@mui/material'
 import { stats } from '@/interfaces'
-import { QUICK_GUIDE } from '@/constants'
-import { relative } from 'path'
+import { QUICK_GUIDE, QUICK_GUIDE_COLLIMATION } from '@/constants'
 
-export const Viewer: FC = () => {
+export const CollimationViewer: FC = () => {
 	const imageId = useAppSelector((state) => state.dicom.imageId)
 	const statistics = useAppSelector((state) => state.dicom.statistics)
 
@@ -66,6 +65,96 @@ export const Viewer: FC = () => {
 		dispatch(updateStatistics(temp))
 	}
 
+	const getCollimatedField = async () => {
+		if (!viewportRef.current) return
+		const image = await cornerstone.loadImage(imageId)
+		const { width, height } = image
+
+		// FIRST RUN TO FUN MAXIMUMS
+		// get max
+		let maxVerticalOnX = 0
+		let maxVertical = -Infinity
+		for (let x = 0; x < width; x++) {
+			const y = width / 2
+			const pixelValue = image.getPixelData()[y * width + x]
+			if (pixelValue > maxVertical) {
+				maxVertical = pixelValue
+				maxVerticalOnX = x
+			}
+		}
+
+		// get max
+		let maxHorizontalOnY = 0
+		let maxHorizontal = -Infinity
+		for (let y = 0; y < height; y++) {
+			const x = height / 2
+			const pixelValue = image.getPixelData()[y * width + x]
+			if (pixelValue > maxHorizontal) {
+				maxHorizontal = pixelValue
+				maxHorizontalOnY = y
+			}
+		}
+
+		// SECOND RUN FOR FIND BORDERS
+		// ------------------ VERTICAL RUN -------------------------
+		let startX = 0
+		let endX = 0
+		let targetValueVertical = maxVertical - (6 * maxVertical) / 100
+		// LEFT TO RIGHT
+		for (let x = 0; x < width; x++) {
+			const y = width / 2
+			const pixelValue = image.getPixelData()[y * width + x]
+			if (pixelValue >= targetValueVertical) {
+				console.log(x, pixelValue, targetValueVertical)
+				startX = x
+				break
+			}
+		}
+		// RIGHT TO LEFT
+		targetValueVertical = maxVertical - (10 * maxVertical) / 100
+		for (let x = width; x > startX; x--) {
+			const y = width / 2
+			const pixelValue = image.getPixelData()[y * width + x]
+			if (pixelValue >= targetValueVertical) {
+				console.log(x, pixelValue, targetValueVertical)
+				endX = x
+				break
+			}
+		}
+
+		// --------------------- HORIZONTAL RUN --------------------
+		let targetValueHorizontal = maxHorizontal - (12 * maxHorizontal) / 100
+		let startY = 0
+		let endY = 0
+		// TOP TO BOTTOM
+		for (let y = 0; y < height; y++) {
+			const x = height / 2
+			const pixelValue = image.getPixelData()[y * width + x]
+			if (pixelValue > targetValueHorizontal) {
+				startY = y
+				console.log(y, pixelValue, targetValueVertical)
+				break
+			}
+		}
+		// BOTTOM TO TOP
+		targetValueHorizontal = maxHorizontal - (6 * maxHorizontal) / 100
+		for (let y = height; y > startY; y--) {
+			const x = height / 2
+			const pixelValue = image.getPixelData()[y * width + x]
+			if (pixelValue > targetValueHorizontal) {
+				endY = y
+				console.log(y, pixelValue, targetValueVertical)
+				break
+			}
+		}
+		console.log(`maxHorizontal: ${maxHorizontal} on ${maxHorizontalOnY}`)
+		console.log(`maxVertical: ${maxVertical} on ${maxVerticalOnX}`)
+
+		console.log(`rect found on ${startX}, ${startY}, ${endX}, ${endY}`)
+		dispatch(setInnerRoi({ startX, startY, endX, endY }))
+		return { startX, startY, endX, endY }
+	}
+
 	const handleImageRendered = async (event: CustomEventType) => {
 		// unlimited renders fixed!
 		if (viewportRef.current) return
@@ -75,97 +164,20 @@ export const Viewer: FC = () => {
 		const { pixelSpacing, imageWidth, imageHeight } = info
 		const x_factor = parseFloat(pixelSpacing.split('\\')[0])
 		const y_factor = parseFloat(pixelSpacing.split('\\')[1])
-
-		const ROI_OFFSET_mm = 20
-		const ROI_SIZE_mm = 20
-
-		const roi_offset_px = [ROI_OFFSET_mm / x_factor, ROI_OFFSET_mm / y_factor]
-		const roi_size_px = [ROI_SIZE_mm / x_factor, ROI_SIZE_mm / y_factor]
-		const image_size_px = [imageWidth, imageHeight]
-
-		let x_left, y_top, x_right, y_bottom, x_center, y_center
-
-		x_left = 0
-		y_top = roi_offset_px[1]
-		x_right = image_size_px[0] - roi_offset_px[0] - roi_size_px[0]
-		y_bottom = image_size_px[1] - roi_offset_px[1] - roi_size_px[1]
-		x_center = (image_size_px[0] - roi_offset_px[0] - roi_size_px[0]) / 2
-		y_center = (image_size_px[1] - roi_offset_px[1] - roi_size_px[0]) / 2
-
+		const results = await getCollimatedField()
+		if (!results) return
+		const { startX, startY, endX, endY } = results
+		console.log(startX, startY, endX, endY)
 		const roiToolData = [
 			{
 				handles: {
 					uuid: ROI_1,
-					start: { x: x_left, y: y_top, active: false, moving: false, highlight: true },
-					end: { x: x_left + roi_size_px[0], y: y_top + roi_size_px[1], active: false, moving: false, highlight: true },
+					start: { x: startX, y: startY, active: false, moving: false, highlight: true },
+					end: { x: endX, y: endY, active: false, moving: false, highlight: true },
 					textBox,
 				},
 				...commonProps,
 				color: 'orange',
-			},
-			{
-				handles: {
-					uuid: ROI_3,
-					initialRotation: 0,
-					start: { x: x_right, y: y_top, active: false, moving: false, highlight: true },
-					end: { x: x_right + roi_size_px[0], y: y_top + roi_size_px[1], active: false, moving: false, highlight: true },
-					textBox,
-					active: false,
-					hasMoved: false,
-				},
-				...commonProps,
-				color: 'white',
-			},
-			{
-				handles: {
-					uuid: ROI_5,
-					initialRotation: 0,
-					start: { x: x_center, y: y_center, active: false, moving: false, highlight: true },
-					end: { x: x_center + roi_size_px[0], y: y_center + roi_size_px[1], active: false, moving: false, highlight: true },
-					textBox,
-					active: false,
-					hasMoved: false,
-				},
-				...commonProps,
-				color: 'darkGray',
-			},
-			{
-				handles: {
-					uuid: ROI_2,
-					initialRotation: 0,
-					start: { x: x_left, y: y_bottom, active: false, moving: false, highlight: true },
-					end: { x: x_left + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
-					textBox,
-					active: false,
-					hasMoved: false,
-				},
-				...commonProps,
-				color: 'orange',
-			},
-
-			{
-				handles: {
-					uuid: ROI_4,
-					initialRotation: 0,
-					start: { x: x_right, y: y_bottom, active: false, moving: false, highlight: true },
-					end: { x: x_right + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
-					textBox,
-					active: false,
-					hasMoved: false,
-				},
-				...commonProps,
-				color: 'white',
-			},
-			{
-				handles: {
-					uuid: ROI_6,
-					initialRotation: 0,
-					start: { x: x_left, y: y_top, active: false, moving: false, highlight: true },
-					end: { x: image_size_px[0] - roi_offset_px[0], y: image_size_px[1] - roi_offset_px[1], active: false, moving: false, highlight: true },
-					textBox,
-				},
-				...commonProps,
-				color: 'darkGray',
 			},
 		]
 
@@ -214,7 +226,7 @@ export const Viewer: FC = () => {
 				{ERROR_IMAGE}
 			</Typography>
 			<>
-				{QUICK_GUIDE.map((value, index) => (
+				{QUICK_GUIDE_COLLIMATION.map((value, index) => (
 					<Typography sx={{ my: 0.5 }} align="justify" variant="h5" key={`qg-${index}`}>
 						{value}
 					</Typography>

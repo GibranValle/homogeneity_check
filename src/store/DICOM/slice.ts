@@ -3,12 +3,20 @@
 import { stats, EMPTY_IMAGE, EMPTY_INFO, type_image, type_info } from '@/interfaces'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+type type_inner_roi = {
+	startX: number
+	startY: number
+	endX: number
+	endY: number
+}
+
 type DICOMState = {
 	image: type_image
 	info: type_info
 	imageId: string
 	statistics: stats[]
 	element: any
+	inner_roi: type_inner_roi | null
 }
 
 const initialState: DICOMState = {
@@ -17,6 +25,7 @@ const initialState: DICOMState = {
 	imageId: '',
 	statistics: [],
 	element: null,
+	inner_roi: null,
 }
 
 const slice = createSlice({
@@ -38,9 +47,12 @@ const slice = createSlice({
 		updateInfo: (state, action: PayloadAction<type_info>) => {
 			state.info = action.payload
 		},
+		setInnerRoi: (state, action: PayloadAction<type_inner_roi>) => {
+			state.inner_roi = action.payload
+		},
 	},
 })
 
-export const { updateImage, updateInfo, updateStatistics, setImageId, setElement } = slice.actions
+export const { updateImage, updateInfo, updateStatistics, setImageId, setElement, setInnerRoi } = slice.actions
 
 export default slice.reducer

@@ -28,3 +28,6 @@ export const ROI_3 = 'Fondo-L'
 export const ROI_4 = 'Fondo-R'
 export const ROI_5 = 'Centro'
 export const ROI_6 = 'Completo'
+
+export const DICOM_HEIGHT = 5928
+export const DICOM_WIDTH = 4728

@@ -17,7 +17,7 @@ import { stats } from '@/interfaces'
 import { QUICK_GUIDE } from '@/constants'
 import { relative } from 'path'
 
-export const Viewer: FC = () => {
+export const MedianViewer: FC = () => {
 	const imageId = useAppSelector((state) => state.dicom.imageId)
 	const statistics = useAppSelector((state) => state.dicom.statistics)
 

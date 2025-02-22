@@ -1,14 +1,14 @@
 'use client'
 //@ts-ignore
 import { useAppSelector } from '@/store'
-import { ChangeEvent, FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import React from 'react'
-import { Final, Lineal, NoLineal } from '.'
+import { Final } from '.'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { linealStats, results, stats } from '@/interfaces/Statistics'
 import { ERROR_IMAGE } from '@/constants/tables'
 
-export const Results: FC = () => {
+export const FinalResults: FC = () => {
 	const statistics = useAppSelector((state) => state.dicom.statistics)
 	const imageId = useAppSelector((state) => state.dicom.imageId)
 
@@ -16,16 +16,8 @@ export const Results: FC = () => {
 	const [linealStatistics, setLinealStatistics] = useState<linealStats[]>([])
 	const [results, setResults] = useState<results[]>([])
 	const [isReady, setIsReady] = useState(false)
-	const [a, setA] = useState(443.666666666667)
-	const [b, setB] = useState(158.7511111)
-
-	const handleTextChange = (event: ChangeEvent<HTMLInputElement>) => {
-		const { id, value } = event.target
-		if (id === 'a') setA(parseFloat(value))
-		else if (id === 'b') setB(parseFloat(value))
-	}
-
-	const handleClick = () => {}
+	const a = 443.666666666667
+	const b = 158.7511111
 
 	const calcData = () => {
 		const newStatistics: linealStats[] = []
@@ -75,22 +67,7 @@ export const Results: FC = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [linealStatistics])
 
-	if (statistics.length > 0 && isReady)
-		return (
-			<Box
-				sx={{
-					flex: '1 1 100px',
-					display: 'flex',
-					flexDirection: 'column',
-					gap: 1,
-					justifyContent: 'space-around',
-				}}
-			>
-				<NoLineal statistics={nonLinearStats} />
-				<Lineal statistics={linealStatistics} a={a} b={b} handleTextChange={handleTextChange} calcData={handleClick} />
-				<Final statistics={results} />
-			</Box>
-		)
+	if (statistics.length > 0 && isReady) return <Final statistics={results} />
 
 	if (imageId)
 		return (

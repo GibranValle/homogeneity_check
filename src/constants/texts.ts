@@ -11,3 +11,13 @@ export const QUICK_GUIDE = [
 	'9) Analizarlas con esta aplicación WEB que desarrollamos con mucho cariño para uds.',
 	'10) Reportar los resultados, esperando que sean exitosos.',
 ]
+
+export const QUICK_GUIDE_COLLIMATION = [
+	'Instrucciones para ajustar la colimación:',
+	'1) Cerrar 10mm los 4 lados del colimador',
+	'2) Abrir un estudio en la AWS 3000, y elegir 3 menus RCC',
+	'3) Realizar exposición con 28kV @20mAs',
+	'4) Exportar la imagen DICOM en DENSIDAD ALTA y SIN PROCESAMIENTO.',
+	'5) Analizarlas con esta aplicación WEB que desarrollamos con mucho cariño para uds.',
+	'6) Abrir el colimador con los valores calculados por este apartado.',
+]
