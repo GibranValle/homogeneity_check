@@ -39,7 +39,6 @@ export const FinalResults: FC = () => {
 			return prev
 		}, 0)
 		const avgRSR = sumRSR / (linealStatistics.length - 1)
-		console.log(avgRSR, sumRSR)
 		const newResults: results[] = []
 		rsr.map((item, index) => {
 			const { roi, vmp, dtp, id, color } = linealStatistics[index]
@@ -69,28 +68,19 @@ export const FinalResults: FC = () => {
 
 	if (statistics.length > 0 && isReady) return <Final statistics={results} />
 
-	if (imageId)
-		return (
-			<Box sx={{ position: 'relative', flex: '1 1 100px' }}>
-				<CircularProgress
-					thickness={7} // Aumenta el grosor de la línea
-					size={200} // Aumenta el tamaño del círculo de progreso
-					color="secondary"
-					sx={{
-						position: 'absolute',
-						zIndex: 1,
-						top: '40%',
-						left: '40%',
-					}}
-				/>
-			</Box>
-		)
-
 	return (
-		<Box sx={{ flex: '1 1 100px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-			<Typography align="center" color={'red'} variant="h2">
-				{ERROR_IMAGE}
-			</Typography>
+		<Box sx={{ position: 'relative', flex: '1 1 100px' }}>
+			<CircularProgress
+				thickness={7} // Aumenta el grosor de la línea
+				size={200} // Aumenta el tamaño del círculo de progreso
+				color="secondary"
+				sx={{
+					position: 'absolute',
+					zIndex: 1,
+					top: '40%',
+					left: '40%',
+				}}
+			/>
 		</Box>
 	)
 }

@@ -10,7 +10,7 @@ import ControlCameraIcon from '@mui/icons-material/ControlCamera'
 import { ZOOM_LIST } from '@/constants/tools'
 import { stats } from '@/interfaces'
 
-export const Editor: FC = () => {
+export const CollimatorEditor: FC = () => {
 	const image = useAppSelector((state) => state.dicom.image)
 	const element = useAppSelector((state) => state.dicom.element)
 	const statistics = useAppSelector((state) => state.dicom.statistics)

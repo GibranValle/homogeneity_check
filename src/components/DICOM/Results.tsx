@@ -47,7 +47,6 @@ export const Results: FC = () => {
 			return prev
 		}, 0)
 		const avgRSR = sumRSR / (linealStatistics.length - 1)
-		console.log(avgRSR, sumRSR)
 		const newResults: results[] = []
 		rsr.map((item, index) => {
 			const { roi, vmp, dtp, id, color } = linealStatistics[index]

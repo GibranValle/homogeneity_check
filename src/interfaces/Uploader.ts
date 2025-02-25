@@ -21,6 +21,7 @@ export type type_info = {
 	patientName: string
 	imageWidth: number
 	imageHeight: number
+	laterality: string
 }
 
 export const EMPTY_INFO: type_info = {
@@ -46,6 +47,7 @@ export const EMPTY_INFO: type_info = {
 	pixelSpacing: '0.05\\0.05',
 	imageWidth: 0,
 	imageHeight: 0,
+	laterality: '',
 }
 
 export type type_image = {

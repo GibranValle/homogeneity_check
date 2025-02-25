@@ -1,9 +1,37 @@
 'use client'
 
-import { Box } from '@mui/material'
-import { Card, Chart, CollimationResults, CollimationViewer, Editor, Uploader } from '@/components'
+import { Box, Container, Paper, Typography } from '@mui/material'
+import { Card, CollimationResults, CollimationUploader, CollimationViewer, CollimatorEditor } from '@/components'
+import { QUICK_GUIDE_COLLIMATION } from '@/constants'
+import { ERROR_IMAGE, INSTRUCTIONS } from '@/constants/tables'
+import { useAppSelector } from '@/store'
 
 export default function Collimation() {
+	const collimatorImageId = useAppSelector((state) => state.dicom.collimatorImageId)
+
+	if (!collimatorImageId)
+		return (
+			<Container sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+				<Typography color={'red'} sx={{ my: 0.5 }} align="center" variant="h2">
+					{ERROR_IMAGE}
+				</Typography>
+
+				<Paper sx={{ p: 2 }} elevation={2}>
+					<CollimationUploader />
+				</Paper>
+
+				<Box component={Paper} elevation={1} sx={{ p: 2, flex: '1 1 100px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+					<Typography align="center" color={'green'} variant="h2">
+						{INSTRUCTIONS}
+					</Typography>
+					{QUICK_GUIDE_COLLIMATION.map((value, index) => (
+						<Typography sx={{ my: 0.5 }} align="justify" variant="h5" key={`qg-${index}`}>
+							{value}
+						</Typography>
+					))}
+				</Box>
+			</Container>
+		)
 	return (
 		<Box
 			sx={{
@@ -20,8 +48,8 @@ export default function Collimation() {
 			}}
 		>
 			<Card minWidth={450} maxWidth={450}>
-				<Uploader />
-				<Editor />
+				<CollimationUploader />
+				<CollimatorEditor />
 				<CollimationResults />
 			</Card>
 

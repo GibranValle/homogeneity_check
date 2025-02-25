@@ -7,7 +7,7 @@ import { Box, Paper, TextField, Typography } from '@mui/material'
 import { DICOM_HEIGHT, DICOM_WIDTH } from '@/constants/roi'
 
 export const CollimationResults: FC = () => {
-	const imageId = useAppSelector((state) => state.dicom.imageId)
+	const collimatorImageId = useAppSelector((state) => state.dicom.collimatorImageId)
 	const innerRoi = useAppSelector((state) => state.dicom.inner_roi)
 
 	const [margin, setMargin] = useState<any>(null)
@@ -23,7 +23,7 @@ export const CollimationResults: FC = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [innerRoi])
 
-	if (!innerRoi || !imageId || !margin) return null
+	if (!innerRoi || !collimatorImageId || !margin) return null
 
 	return (
 		<Box
@@ -74,6 +74,9 @@ export const CollimationResults: FC = () => {
 					disabled
 				/>
 			</Box>
+			<Typography variant="subtitle2" color={'warning.main'} textAlign={'justify'}>
+				Nota: Valores de 4mm indican que no hubo colimación.
+			</Typography>
 		</Box>
 	)
 }

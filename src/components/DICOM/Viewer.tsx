@@ -11,11 +11,8 @@ import { CustomEventType } from '@cornerstonejs/core/dist/types/types'
 import cornerstone from 'cornerstone-core'
 import { setElement, updateStatistics } from '@/store/DICOM/slice'
 import { commonProps, ROI_1, ROI_2, ROI_3, ROI_4, ROI_5, ROI_6, textBox } from '@/constants/roi'
-import { ERROR_IMAGE } from '@/constants/tables'
-import { Box, CircularProgress, Typography } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { stats } from '@/interfaces'
-import { QUICK_GUIDE } from '@/constants'
-import { relative } from 'path'
 
 export const Viewer: FC = () => {
 	const imageId = useAppSelector((state) => state.dicom.imageId)
@@ -69,6 +66,7 @@ export const Viewer: FC = () => {
 	const handleImageRendered = async (event: CustomEventType) => {
 		// unlimited renders fixed!
 		if (viewportRef.current) return
+		const laterality = info.laterality
 		const element = event.detail.element
 		viewportRef.current = element
 		dispatch(setElement(element))
@@ -79,49 +77,77 @@ export const Viewer: FC = () => {
 		const ROI_OFFSET_mm = 20
 		const ROI_SIZE_mm = 20
 
-		const roi_offset_px = [ROI_OFFSET_mm / x_factor, ROI_OFFSET_mm / y_factor]
-		const roi_size_px = [ROI_SIZE_mm / x_factor, ROI_SIZE_mm / y_factor]
-		const image_size_px = [imageWidth, imageHeight]
+		const roi_x_offset_px = ROI_OFFSET_mm / x_factor
+		const roi_y_offset_px = ROI_OFFSET_mm / y_factor
 
-		let x_left, y_top, x_right, y_bottom, x_center, y_center
+		const roi_x_size_px = ROI_SIZE_mm / x_factor
+		const roi_y_size_px = ROI_SIZE_mm / y_factor
 
-		x_left = 0
-		y_top = roi_offset_px[1]
-		x_right = image_size_px[0] - roi_offset_px[0] - roi_size_px[0]
-		y_bottom = image_size_px[1] - roi_offset_px[1] - roi_size_px[1]
-		x_center = (image_size_px[0] - roi_offset_px[0] - roi_size_px[0]) / 2
-		y_center = (image_size_px[1] - roi_offset_px[1] - roi_size_px[0]) / 2
+		let x_left, y_top, x_right, y_bottom, x_center, y_center, roi_x_offset_px_end
+
+		y_top = roi_y_offset_px
+		y_bottom = imageHeight - roi_y_offset_px - roi_y_size_px
+		y_center = (imageHeight - roi_y_offset_px) / 2
+
+		let ROI_LEFT_TOP, ROI_RIGHT_TOP, ROI_LEFT_BOTTOM, ROI_RIGHT_BOTTOM
+
+		let right_color, left_color
+
+		// SMART DETECTION
+		if (laterality === 'R') {
+			x_left = roi_x_offset_px
+			x_right = imageWidth - roi_x_offset_px
+			x_center = (imageWidth - roi_x_size_px + roi_x_offset_px) / 2
+			roi_x_offset_px_end = 0
+			ROI_LEFT_TOP = ROI_4
+			ROI_LEFT_BOTTOM = ROI_3
+			ROI_RIGHT_TOP = ROI_2
+			ROI_RIGHT_BOTTOM = ROI_1
+			right_color = 'orange'
+			left_color = 'white'
+		} else {
+			x_left = 0
+			x_right = imageWidth - roi_x_offset_px - roi_x_size_px
+			x_center = (imageWidth - roi_x_offset_px - roi_x_size_px) / 2
+			roi_x_offset_px_end = roi_x_offset_px
+			ROI_LEFT_TOP = ROI_1
+			ROI_LEFT_BOTTOM = ROI_2
+			ROI_RIGHT_TOP = ROI_3
+			ROI_RIGHT_BOTTOM = ROI_4
+			right_color = 'white'
+			left_color = 'orange'
+		}
 
 		const roiToolData = [
 			{
 				handles: {
-					uuid: ROI_1,
+					uuid: ROI_LEFT_TOP,
 					start: { x: x_left, y: y_top, active: false, moving: false, highlight: true },
-					end: { x: x_left + roi_size_px[0], y: y_top + roi_size_px[1], active: false, moving: false, highlight: true },
+					end: { x: x_left + roi_x_size_px, y: y_top + roi_y_size_px, active: false, moving: false, highlight: true },
 					textBox,
 				},
 				...commonProps,
-				color: 'orange',
+				color: left_color,
 			},
 			{
 				handles: {
-					uuid: ROI_3,
+					uuid: ROI_RIGHT_TOP,
 					initialRotation: 0,
 					start: { x: x_right, y: y_top, active: false, moving: false, highlight: true },
-					end: { x: x_right + roi_size_px[0], y: y_top + roi_size_px[1], active: false, moving: false, highlight: true },
+					end: { x: x_right + roi_x_size_px, y: y_top + roi_y_size_px, active: false, moving: false, highlight: true },
 					textBox,
 					active: false,
 					hasMoved: false,
 				},
 				...commonProps,
-				color: 'white',
+				color: right_color,
 			},
 			{
 				handles: {
 					uuid: ROI_5,
 					initialRotation: 0,
 					start: { x: x_center, y: y_center, active: false, moving: false, highlight: true },
-					end: { x: x_center + roi_size_px[0], y: y_center + roi_size_px[1], active: false, moving: false, highlight: true },
+					end: { x: x_center + roi_x_size_px, y: y_center + roi_y_size_px, active: false, moving: false, highlight: true },
 					textBox,
 					active: false,
 					hasMoved: false,
@@ -131,37 +157,38 @@ export const Viewer: FC = () => {
 			},
 			{
 				handles: {
-					uuid: ROI_2,
+					uuid: ROI_LEFT_BOTTOM,
 					initialRotation: 0,
 					start: { x: x_left, y: y_bottom, active: false, moving: false, highlight: true },
-					end: { x: x_left + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
+					end: { x: x_left + roi_x_size_px, y: y_bottom + roi_y_size_px, active: false, moving: false, highlight: true },
 					textBox,
 					active: false,
 					hasMoved: false,
 				},
 				...commonProps,
-				color: 'orange',
+				color: left_color,
 			},
 
 			{
 				handles: {
-					uuid: ROI_4,
+					uuid: ROI_RIGHT_BOTTOM,
 					initialRotation: 0,
 					start: { x: x_right, y: y_bottom, active: false, moving: false, highlight: true },
-					end: { x: x_right + roi_size_px[0], y: y_bottom + roi_size_px[1], active: false, moving: false, highlight: true },
+					end: { x: x_right + roi_x_size_px, y: y_bottom + roi_y_size_px, active: false, moving: false, highlight: true },
 					textBox,
 					active: false,
 					hasMoved: false,
 				},
 				...commonProps,
-				color: 'white',
+				color: right_color,
 			},
+			// COMPLETO
 			{
 				handles: {
 					uuid: ROI_6,
 					initialRotation: 0,
 					start: { x: x_left, y: y_top, active: false, moving: false, highlight: true },
-					end: { x: image_size_px[0] - roi_offset_px[0], y: image_size_px[1] - roi_offset_px[1], active: false, moving: false, highlight: true },
+					end: { x: imageWidth - roi_x_offset_px_end, y: imageHeight - roi_y_offset_px, active: false, moving: false, highlight: true },
 					textBox,
 				},
 				...commonProps,
@@ -174,52 +201,36 @@ export const Viewer: FC = () => {
 		await calcData()
 	}
 
-	if (imageId)
-		return (
-			<Box sx={{ position: 'relative', flex: '1 1 100px' }}>
-				<CornerstoneViewport
-					viewport
-					// tools={tools}
-					imageIds={[imageId]}
-					style={{ height: '850px' }}
-					eventListeners={[
-						{
-							target: 'element',
-							eventName: 'cornerstoneimagerendered',
-							handler: handleImageRendered,
-						},
-					]}
-				/>
-				{statistics.length === 0 ? (
-					<CircularProgress
-						thickness={7} // Aumenta el grosor de la línea
-						size={200} // Aumenta el tamaño del círculo de progreso
-						color="secondary"
-						sx={{
-							position: 'absolute',
-							zIndex: 1,
-							top: '40%',
-							left: '40%',
-						}}
-					/>
-				) : (
-					<></>
-				)}
-			</Box>
-		)
-
 	return (
-		<Box sx={{ flex: '1 1 100px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-			<Typography align="center" color={'red'} variant="h2">
-				{ERROR_IMAGE}
-			</Typography>
-			<>
-				{QUICK_GUIDE.map((value, index) => (
-					<Typography sx={{ my: 0.5 }} align="justify" variant="h5" key={`qg-${index}`}>
-						{value}
-					</Typography>
-				))}
-			</>
+		<Box sx={{ position: 'relative', flex: '1 1 100px' }}>
+			<CornerstoneViewport
+				viewport
+				// tools={tools}
+				imageIds={[imageId]}
+				style={{ height: '850px' }}
+				eventListeners={[
+					{
+						target: 'element',
+						eventName: 'cornerstoneimagerendered',
+						handler: handleImageRendered,
+					},
+				]}
+			/>
+			{statistics.length === 0 ? (
+				<CircularProgress
+					thickness={7} // Aumenta el grosor de la línea
+					size={200} // Aumenta el tamaño del círculo de progreso
+					color="secondary"
+					sx={{
+						position: 'absolute',
+						zIndex: 1,
+						top: '40%',
+						left: '40%',
+					}}
+				/>
+			) : (
+				<></>
+			)}
 		</Box>
 	)
 }
