@@ -12,11 +12,12 @@ import cornerstone from 'cornerstone-core'
 import { setElement, setInnerRoi } from '@/store/DICOM/slice'
 import { commonProps, ROI_1, textBox } from '@/constants/roi'
 import { ERROR_IMAGE } from '@/constants/tables'
-import { Box, Typography } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import { QUICK_GUIDE_COLLIMATION } from '@/constants'
 
 export const CollimationViewer: FC = () => {
-	const collimatorImageId = useAppSelector((state) => state.dicom.collimatorImageId)
+	const imageId = useAppSelector((state) => state.dicom.imageId)
+	const inner_roi = useAppSelector((state) => state.dicom.inner_roi)
 
 	const viewportRef = useRef(null)
 	const dispatch = useDispatch()
@@ -25,7 +26,7 @@ export const CollimationViewer: FC = () => {
 
 	const getCollimatedField = async () => {
 		if (!viewportRef.current) return
-		const image = await cornerstone.loadImage(collimatorImageId)
+		const image = await cornerstone.loadImage(imageId)
 		const { width, height } = image
 
 		// FIRST RUN TO FUN MAXIMUMS
@@ -63,7 +64,6 @@ export const CollimationViewer: FC = () => {
 			const y = width / 2
 			const pixelValue = image.getPixelData()[y * width + x]
 			if (pixelValue >= targetValueVertical) {
-				console.log(x, pixelValue, targetValueVertical)
 				startX = x
 				break
 			}
@@ -74,7 +74,6 @@ export const CollimationViewer: FC = () => {
 			const y = width / 2
 			const pixelValue = image.getPixelData()[y * width + x]
 			if (pixelValue >= targetValueVertical) {
-				console.log(x, pixelValue, targetValueVertical)
 				endX = x
 				break
 			}
@@ -90,7 +89,6 @@ export const CollimationViewer: FC = () => {
 			const pixelValue = image.getPixelData()[y * width + x]
 			if (pixelValue > targetValueHorizontal) {
 				startY = y
-				console.log(y, pixelValue, targetValueVertical)
 				break
 			}
 		}
@@ -101,14 +99,12 @@ export const CollimationViewer: FC = () => {
 			const pixelValue = image.getPixelData()[y * width + x]
 			if (pixelValue > targetValueHorizontal) {
 				endY = y
-				console.log(y, pixelValue, targetValueVertical)
 				break
 			}
 		}
 		console.log(`maxHorizontal: ${maxHorizontal} on ${maxHorizontalOnY}`)
 		console.log(`maxVertical: ${maxVertical} on ${maxVerticalOnX}`)
 
-		console.log(`rect found on ${startX}, ${startY}, ${endX}, ${endY}`)
 		dispatch(setInnerRoi({ startX, startY, endX, endY }))
 		return { startX, startY, endX, endY }
 	}
@@ -140,13 +136,13 @@ export const CollimationViewer: FC = () => {
 		cornerstone.updateImage(element)
 	}
 
-	if (collimatorImageId)
+	if (imageId)
 		return (
 			<Box sx={{ position: 'relative', flex: '1 1 100px' }}>
 				<CornerstoneViewport
 					viewport
 					// tools={tools}
-					imageIds={[collimatorImageId]}
+					imageIds={[imageId]}
 					style={{ height: '850px' }}
 					eventListeners={[
 						{
@@ -156,6 +152,21 @@ export const CollimationViewer: FC = () => {
 						},
 					]}
 				/>
+				{!inner_roi ? (
+					<CircularProgress
+						thickness={7} // Aumenta el grosor de la línea
+						size={200} // Aumenta el tamaño del círculo de progreso
+						color="secondary"
+						sx={{
+							position: 'absolute',
+							zIndex: 1,
+							top: '40%',
+							left: '40%',
+						}}
+					/>
+				) : (
+					<></>
+				)}
 			</Box>
 		)
 

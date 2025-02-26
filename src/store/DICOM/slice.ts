@@ -17,8 +17,6 @@ type DICOMState = {
 	statistics: stats[]
 	element: any
 	inner_roi: type_inner_roi | null
-	collimatorImage: type_image
-	collimatorImageId: string
 }
 
 const initialState: DICOMState = {
@@ -28,8 +26,6 @@ const initialState: DICOMState = {
 	statistics: [],
 	element: null,
 	inner_roi: null,
-	collimatorImage: EMPTY_IMAGE,
-	collimatorImageId: '',
 }
 
 const slice = createSlice({
@@ -38,9 +34,6 @@ const slice = createSlice({
 	reducers: {
 		setImageId: (state, action: PayloadAction<string>) => {
 			state.imageId = action.payload
-		},
-		setCollimatorImageId: (state, action: PayloadAction<string>) => {
-			state.collimatorImageId = action.payload
 		},
 		setElement: (state, action: PayloadAction<any>) => {
 			state.element = action.payload
@@ -51,19 +44,15 @@ const slice = createSlice({
 		updateImage: (state, action: PayloadAction<type_image>) => {
 			state.image = action.payload
 		},
-		updateCollimationImage: (state, action: PayloadAction<type_image>) => {
-			state.collimatorImage = action.payload
-		},
 		updateInfo: (state, action: PayloadAction<type_info>) => {
 			state.info = action.payload
 		},
-		setInnerRoi: (state, action: PayloadAction<type_inner_roi>) => {
+		setInnerRoi: (state, action: PayloadAction<type_inner_roi | null>) => {
 			state.inner_roi = action.payload
 		},
 	},
 })
 
-export const { updateImage, updateCollimationImage, updateInfo, updateStatistics, setImageId, setElement, setInnerRoi, setCollimatorImageId } =
-	slice.actions
+export const { updateImage, updateInfo, updateStatistics, setImageId, setElement, setInnerRoi } = slice.actions
 
 export default slice.reducer

@@ -91,6 +91,7 @@ export const CollimatorEditor: FC = () => {
 		setBestCenter(c)
 		setBestWidth(w)
 		triggerChange(w, c)
+		//react-hooks/exhaustive-deps
 	}, [statistics])
 
 	return (

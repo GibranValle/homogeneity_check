@@ -7,9 +7,9 @@ import { ERROR_IMAGE, INSTRUCTIONS } from '@/constants/tables'
 import { useAppSelector } from '@/store'
 
 export default function Collimation() {
-	const collimatorImageId = useAppSelector((state) => state.dicom.collimatorImageId)
+	const imageId = useAppSelector((state) => state.dicom.imageId)
 
-	if (!collimatorImageId)
+	if (!imageId)
 		return (
 			<Container sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
 				<Typography color={'red'} sx={{ my: 0.5 }} align="center" variant="h2">

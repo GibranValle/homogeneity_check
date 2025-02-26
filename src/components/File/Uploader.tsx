@@ -6,9 +6,9 @@ import { Box, Button, Typography } from '@mui/material'
 import { ChangeEvent, FC } from 'react'
 import dicomParser from 'dicom-parser'
 import { useDispatch } from 'react-redux'
-import { setImageId, updateImage, updateInfo } from '@/store/DICOM/slice'
+import { setImageId, updateImage, updateInfo, updateStatistics } from '@/store/DICOM/slice'
 import { loadAndViewImageBlob } from '@/lib/initializeCornerstone'
-import { EMPTY_IMAGE } from '@/interfaces'
+import { EMPTY_IMAGE, EMPTY_INFO } from '@/interfaces'
 import { useAppSelector } from '@/store'
 
 export const Uploader: FC = () => {
@@ -116,6 +116,8 @@ export const Uploader: FC = () => {
 	}
 
 	const handleClean = () => {
+		dispatch(updateInfo(EMPTY_INFO))
+		dispatch(updateStatistics([]))
 		dispatch(updateImage(EMPTY_IMAGE))
 		dispatch(setImageId(''))
 	}

@@ -6,20 +6,20 @@ import { Box, Button, Typography } from '@mui/material'
 import { ChangeEvent, FC } from 'react'
 import dicomParser from 'dicom-parser'
 import { useDispatch } from 'react-redux'
-import { setCollimatorImageId, updateCollimationImage } from '@/store/DICOM/slice'
+import { setImageId, setInnerRoi, updateImage, updateInfo } from '@/store/DICOM/slice'
 import { loadAndViewImageBlob } from '@/lib/initializeCornerstone'
-import { EMPTY_IMAGE } from '@/interfaces'
+import { EMPTY_IMAGE, EMPTY_INFO } from '@/interfaces'
 import { useAppSelector } from '@/store'
 
 export const CollimationUploader: FC = () => {
 	const dispatch = useDispatch()
-	const collimatorImageId = useAppSelector((state) => state.dicom.collimatorImageId)
-	const name = useAppSelector((state) => state.dicom.collimatorImage.name)
+	const imageId = useAppSelector((state) => state.dicom.imageId)
+	const name = useAppSelector((state) => state.dicom.image.name)
 
 	const handleChangeImage = async (e: ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files![0]
 		const loadedImageId = loadAndViewImageBlob(file)
-		dispatch(setCollimatorImageId(loadedImageId))
+		dispatch(setImageId(loadedImageId))
 
 		// DICOM READ
 		const base64String = (await readFile(file)) as string
@@ -41,7 +41,7 @@ export const CollimationUploader: FC = () => {
 		const pixelData = new Uint16Array(dataSet.byteArray.buffer, pixelDataElement.dataOffset, pixelDataElement.length / bytesPerPixel)
 
 		dispatch(
-			updateCollimationImage({
+			updateImage({
 				name: file.name,
 				imageWidth,
 				imageHeight,
@@ -56,11 +56,13 @@ export const CollimationUploader: FC = () => {
 	}
 
 	const handleClean = () => {
-		dispatch(updateCollimationImage(EMPTY_IMAGE))
-		dispatch(setCollimatorImageId(''))
+		dispatch(updateImage(EMPTY_IMAGE))
+		dispatch(setImageId(''))
+		dispatch(setInnerRoi(null))
+		dispatch(updateInfo(EMPTY_INFO))
 	}
 
-	if (collimatorImageId) {
+	if (imageId) {
 		return (
 			<Box
 				sx={{

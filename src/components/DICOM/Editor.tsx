@@ -91,7 +91,8 @@ export const Editor: FC = () => {
 		setBestCenter(c)
 		setBestWidth(w)
 		triggerChange(w, c)
-	}, [statistics])
+		//react-hooks/exhaustive-deps
+		}, [statistics])
 
 	return (
 		<Box
