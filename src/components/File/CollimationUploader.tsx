@@ -26,6 +26,27 @@ export const CollimationUploader: FC = () => {
 		const base64Image = base64String.split(';base64,').pop()
 		const dicomBuffer = Buffer.from(base64Image!, 'base64')
 		const dataSet = dicomParser.parseDicom(dicomBuffer as Uint8Array)
+		const KV = dataSet.string('x00180060') || ''
+		const exposure = dataSet.string('x00181152') || ''
+		const date = dataSet.string('x0018700c') || ''
+		const sensitivity = dataSet.string('x00186000') || ''
+		const filter = dataSet.string('x00187050') || ''
+		const mode = dataSet.string('x00187060') || ''
+		const serialNumber = dataSet.string('x00181000') || ''
+		const version = dataSet.string('x00181020') || ''
+		const grid = dataSet.string('x00181166') || ''
+		const anode = dataSet.string('x00181191') || ''
+		const thickness = dataSet.string('x001811a0') || ''
+		const force = dataSet.string('x001811a2') || ''
+		const paddle = dataSet.string('x001811a4') || ''
+		const menu = dataSet.string('x00181400') || ''
+		const presentation = dataSet.string('x00080068') || ''
+		const modality = dataSet.string('x00080060') || ''
+		const institution = dataSet.string('x00080080') || ''
+		const station = dataSet.string('x00081010') || ''
+		const patientName = dataSet.string('x00100010') || ''
+		const pixelSpacing = dataSet.string('x00181164') || ''
+		const laterality = dataSet.string('x00200062') || ''
 
 		//DATA FOR EDITOR
 		const slope = parseInt(dataSet.string('x00281053') || '1')
@@ -51,6 +72,34 @@ export const CollimationUploader: FC = () => {
 				windowWidth,
 				intercept,
 				file: file,
+			})
+		)
+
+		dispatch(
+			updateInfo({
+				KV,
+				sensitivity,
+				date,
+				filter,
+				mode,
+				serialNumber,
+				version,
+				exposure,
+				grid,
+				anode,
+				thickness,
+				force,
+				paddle,
+				menu,
+				presentation,
+				modality,
+				institution,
+				station,
+				patientName,
+				pixelSpacing,
+				imageHeight,
+				imageWidth,
+				laterality,
 			})
 		)
 	}
